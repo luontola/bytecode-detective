@@ -306,65 +306,11 @@
     <output url="file://$PROJECT_DIR$/classes" />
   </component>
   <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="All tests" type="JUnit" factoryName="JUnit" enabled="false" merge="false" sample_coverage="true" runner="emma">
+    <configuration default="false" name="allSpecs" type="SpecsRunConfiguration" factoryName="Specs">
       <module name="bytecode-detective" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" value="" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="" />
-      <option name="METHOD_NAME" value="" />
-      <option name="TEST_OBJECT" value="package" />
-      <option name="VM_PARAMETERS" value="-ea" />
-      <option name="PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="ADDITIONAL_CLASS_PATH" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="wholeProject" />
-      </option>
-      <envs />
-      <RunnerSettings RunnerId="Profile CPU">
-        <option name="startFromMode" value="MAIN_CLASS" />
-        <option name="otherClassesToStartFrom" value="" />
-        <option name="profileNewRunnables" value="true" />
-        <option name="filteringMode" value="EXCLUDE" />
-        <option name="filterIncludeClasses" value="" />
-        <option name="filterExcludeClasses" value="java.*, javax.*,&#10;sun.*, sunw.*, com.sun.*" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Profile Memory">
-        <option name="profileAllocMode" value="ALLOC_AND_GC" />
-        <option name="profileAllocInterval" value="10" />
-        <option name="recordAllocTraces" value="false" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method>
-        <option name="Make" value="true" />
-      </method>
-    </configuration>
-    <configuration default="false" name="All tests with coverage" type="JUnit" factoryName="JUnit" enabled="true" merge="false" track_test_folders="true" runner="idea">
-      <pattern>
-        <option name="PATTERN" value="net.orfjackal.*" />
-        <option name="ENABLED" value="true" />
-      </pattern>
-      <module name="bytecode-detective" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" value="" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="" />
-      <option name="METHOD_NAME" value="" />
-      <option name="TEST_OBJECT" value="package" />
-      <option name="VM_PARAMETERS" value="-ea" />
-      <option name="PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="ADDITIONAL_CLASS_PATH" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="wholeProject" />
-      </option>
-      <envs />
+      <setting name="path" value="net.orfjackal.bcd.allSpecs" />
+      <setting name="vmparams" value="-ea" />
+      <setting name="params" value="" />
       <RunnerSettings RunnerId="Profile CPU">
         <option name="startFromMode" value="MAIN_CLASS" />
         <option name="otherClassesToStartFrom" value="" />
@@ -461,6 +407,50 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$M2_REPO$/asm/asm-util/3.1/asm-util-3.1-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.scala-lang:scala-library:2.7.5">
+      <CLASSES>
+        <root url="jar://$M2_REPO$/org/scala-lang/scala-library/2.7.5/scala-library-2.7.5.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$M2_REPO$/org/scala-lang/scala-library/2.7.5/scala-library-2.7.5-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$M2_REPO$/org/scala-lang/scala-library/2.7.5/scala-library-2.7.5-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.scala-lang:scala-compiler:2.7.5">
+      <CLASSES>
+        <root url="jar://$M2_REPO$/org/scala-lang/scala-compiler/2.7.5/scala-compiler-2.7.5.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$M2_REPO$/org/scala-lang/scala-compiler/2.7.5/scala-compiler-2.7.5-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$M2_REPO$/org/scala-lang/scala-compiler/2.7.5/scala-compiler-2.7.5-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.scala-tools.testing:specs:1.5.0">
+      <CLASSES>
+        <root url="jar://$M2_REPO$/org/scala-tools/testing/specs/1.5.0/specs-1.5.0.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$M2_REPO$/org/scala-tools/testing/specs/1.5.0/specs-1.5.0-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$M2_REPO$/org/scala-tools/testing/specs/1.5.0/specs-1.5.0-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: asm:asm-commons:3.1">
+      <CLASSES>
+        <root url="jar://$M2_REPO$/asm/asm-commons/3.1/asm-commons-3.1.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$M2_REPO$/asm/asm-commons/3.1/asm-commons-3.1-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$M2_REPO$/asm/asm-commons/3.1/asm-commons-3.1-sources.jar!/" />
       </SOURCES>
     </library>
   </component>
