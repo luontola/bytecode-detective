@@ -7,9 +7,10 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree._
 
 class MethodContext(
-        val stack: List[Value]
+        val stack: List[Value],
+        val locals: Map[Int, Value]
         ) {
-  def this() = this (Nil)
+  def this() = this (Nil, Map())
 
   def execute(insn: AbstractInsnNode): MethodContext = {
     insn.getType match {
@@ -44,12 +45,13 @@ class MethodContext(
   }
 
   private def execute(insn: VarInsnNode) = {
+    val idx = insn.`var`
     insn.getOpcode match {
-      case Opcodes.ILOAD => push(KnownType(classOf[Int]))
-      case Opcodes.LLOAD => push(KnownType(classOf[Long])).push(KnownType(classOf[Long]))
-      case Opcodes.FLOAD => push(KnownType(classOf[Float]))
-      case Opcodes.DLOAD => push(KnownType(classOf[Double])).push(KnownType(classOf[Double]))
-      case Opcodes.ALOAD => push(KnownType(classOf[Object]))
+      case Opcodes.ILOAD => load(idx, classOf[Int])
+      case Opcodes.LLOAD => load2(idx, classOf[Long])
+      case Opcodes.FLOAD => load(idx, classOf[Float])
+      case Opcodes.DLOAD => load2(idx, classOf[Double])
+      case Opcodes.ALOAD => load(idx, classOf[Object])
       case Opcodes.ISTORE => pop()
       case Opcodes.LSTORE => pop().pop()
       case Opcodes.FSTORE => pop()
@@ -132,10 +134,32 @@ class MethodContext(
   }
 
   private def push(v: Value) = {
-    new MethodContext(v :: stack)
+    new MethodContext(v :: stack, locals)
   }
 
   private def pop() = {
-    new MethodContext(stack.tail)
+    new MethodContext(stack.tail, locals)
   }
+
+  private def load(idx: Int, typ: Class[_]) = {
+    val value = locals.get(idx) match {
+      case Some(v: KnownValue) => v
+      case Some(v: KnownRef) => v
+      case _ => KnownType(typ)
+    }
+    new MethodContext(value :: stack, locals.update(idx, value))
+  }
+
+  // We have decided to store 64-bit data as follows:
+  // - stack words: lower bytes at top
+  // - local variables: lower bytes at the lower index
+  //
+  // Implementors are free to decide the appropriate way to divide a 64-bit data value between two local variables.
+  // [3.6.1, p. 67 in JVMS]
+  //
+  // Implementors are free to decide the appropriate way to divide a 64-bit data value between two operand stack words.
+  // [3.6.2, p. 67 in JVMS]
+
+  private def load2(idx: Int, typ: Class[_]) = load(idx + 1, typ).load(idx, typ)
+
 }
