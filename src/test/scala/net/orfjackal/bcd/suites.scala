@@ -8,7 +8,8 @@ import org.specs.runner._
 
 object allSpecs extends Specification {
   "All specs" areSpecifiedBy (
-          new interpretingBytecodeInstructionsSpec
+          new interpretingSpec,
+          new interpretingVarInsnSpec
           )
 }
 

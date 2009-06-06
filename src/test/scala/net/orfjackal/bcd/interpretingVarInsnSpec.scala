@@ -8,18 +8,7 @@ import org.objectweb.asm.tree._
 import org.specs._
 import org.specs.runner._
 
-class interpretingBytecodeInstructionsSpec extends Specification {
-  "When no commands have been executed" should {
-    "the stack is empty" in {
-      var c = new MethodContext
-      c.stack must_== List()
-    }
-    "the locals are empty" in {
-      var c = new MethodContext
-      c.locals must_== Map()
-    }
-  }
-
+class interpretingVarInsnSpec extends Specification {
   "Loading unset local variables" should {
     def stackAfter(insn: AbstractInsnNode) = {
       val c = new MethodContext()
@@ -182,20 +171,6 @@ class interpretingBytecodeInstructionsSpec extends Specification {
       c.stack must_== List()
       c.locals must_== Map(
         0 -> KnownRef("x", classOf[String]))
-    }
-  }
-
-  "Unsupported bytecode V1_5 commands" should {
-    // See ASM Guide 3.0, Appendix 2. 
-    // Use the org.objectweb.asm.commons.JSRInlinerAdapter class
-    // to remove JSR and RET instructions in order to simplify code analysis.
-    "JSR" in { // Jump to SubRoutine
-      val c = new MethodContext()
-      c.execute(new JumpInsnNode(Opcodes.JSR, new LabelNode())) must throwA[IllegalArgumentException]
-    }
-    "RET" in { // RETurn from subroutine
-      val c = new MethodContext()
-      c.execute(new VarInsnNode(Opcodes.RET, 0)) must throwA[IllegalArgumentException]
     }
   }
 }
