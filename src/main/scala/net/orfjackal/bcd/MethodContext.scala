@@ -31,6 +31,18 @@ class MethodContext(
     }
   }
 
+  private def execute(insn: InsnNode) = {
+    insn.getOpcode match {
+      case _ => this
+    }
+  }
+
+  private def execute(insn: IntInsnNode) = {
+    insn.getOpcode match {
+      case _ => this
+    }
+  }
+
   private def execute(insn: VarInsnNode) = {
     insn.getOpcode match {
       case Opcodes.ILOAD => push(KnownType(classOf[Int]))
@@ -47,9 +59,75 @@ class MethodContext(
     }
   }
 
+  private def execute(insn: TypeInsnNode) = {
+    insn.getOpcode match {
+      case _ => this
+    }
+  }
+
+  private def execute(insn: FieldInsnNode) = {
+    insn.getOpcode match {
+      case _ => this
+    }
+  }
+
+  private def execute(insn: MethodInsnNode) = {
+    insn.getOpcode match {
+      case _ => this
+    }
+  }
+
   private def execute(insn: JumpInsnNode) = {
     insn.getOpcode match {
       case Opcodes.JSR => throw new IllegalArgumentException("V1_5 bytecode is not supported")
+    }
+  }
+
+  private def execute(insn: LabelNode) = {
+    insn.getOpcode match {
+      case _ => this
+    }
+  }
+
+  private def execute(insn: LdcInsnNode) = {
+    insn.getOpcode match {
+      case _ => this
+    }
+  }
+
+  private def execute(insn: IincInsnNode) = {
+    insn.getOpcode match {
+      case _ => this
+    }
+  }
+
+  private def execute(insn: TableSwitchInsnNode) = {
+    insn.getOpcode match {
+      case _ => this
+    }
+  }
+
+  private def execute(insn: LookupSwitchInsnNode) = {
+    insn.getOpcode match {
+      case _ => this
+    }
+  }
+
+  private def execute(insn: MultiANewArrayInsnNode) = {
+    insn.getOpcode match {
+      case _ => this
+    }
+  }
+
+  private def execute(insn: FrameNode) = {
+    insn.getOpcode match {
+      case _ => this
+    }
+  }
+
+  private def execute(insn: LineNumberNode) = {
+    insn.getOpcode match {
+      case _ => this
     }
   }
 
