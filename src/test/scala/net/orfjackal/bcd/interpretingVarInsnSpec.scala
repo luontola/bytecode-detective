@@ -9,28 +9,6 @@ import org.specs._
 import org.specs.runner._
 
 class interpretingVarInsnSpec extends Specification {
-  "Loading unset local variables" should {
-    def stackAfter(insn: AbstractInsnNode) = {
-      val c = new MethodContext()
-      c.execute(insn).stack
-    }
-    "ILOAD" in {
-      stackAfter(new VarInsnNode(Opcodes.ILOAD, 0)) must_== List(KnownType(classOf[Int]))
-    }
-    "LLOAD" in {
-      stackAfter(new VarInsnNode(Opcodes.LLOAD, 0)) must_== List(KnownType(classOf[Long]), KnownType(classOf[Long]))
-    }
-    "FLOAD" in {
-      stackAfter(new VarInsnNode(Opcodes.FLOAD, 0)) must_== List(KnownType(classOf[Float]))
-    }
-    "DLOAD" in {
-      stackAfter(new VarInsnNode(Opcodes.DLOAD, 0)) must_== List(KnownType(classOf[Double]), KnownType(classOf[Double]))
-    }
-    "ALOAD" in {
-      stackAfter(new VarInsnNode(Opcodes.ALOAD, 0)) must_== List(KnownType(classOf[Object]))
-    }
-  }
-
   "Loading unknown local variables" should {
     def exec(insn: AbstractInsnNode) = {
       val stack = List()
@@ -122,19 +100,6 @@ class interpretingVarInsnSpec extends Specification {
       c.locals must_== Map(
         0 -> KnownType(classOf[Long]),
         1 -> KnownType(classOf[Long]))
-    }
-    "FSTORE" in {
-      val c = exec(new VarInsnNode(Opcodes.FSTORE, 0))
-      c.stack must_== List(UnknownValue())
-      c.locals must_== Map(
-        0 -> KnownType(classOf[Float]))
-    }
-    "DSTORE" in {
-      val c = exec(new VarInsnNode(Opcodes.DSTORE, 0))
-      c.stack must_== List()
-      c.locals must_== Map(
-        0 -> KnownType(classOf[Double]),
-        1 -> KnownType(classOf[Double]))
     }
     "ASTORE" in {
       val c = exec(new VarInsnNode(Opcodes.ASTORE, 0))
