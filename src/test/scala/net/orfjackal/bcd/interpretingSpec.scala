@@ -11,11 +11,11 @@ import org.specs.runner._
 class interpretingSpec extends Specification {
   "When no commands have been executed" should {
     "the stack is empty" in {
-      var c = new MethodContext
+      var c = new MethodContext()
       c.stack must_== List()
     }
     "the locals are empty" in {
-      var c = new MethodContext
+      var c = new MethodContext()
       c.locals must_== Map()
     }
   }

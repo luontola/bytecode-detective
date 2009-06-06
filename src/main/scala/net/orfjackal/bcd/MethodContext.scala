@@ -61,6 +61,39 @@ class MethodContext(
     }
   }
 
+  private def load(idx: Int, typ: Class[_]) = {
+    val value = locals.get(idx) match {
+      case Some(v: KnownValue) => v
+      case Some(v: KnownRef) => v
+      case _ => KnownType(typ)
+    }
+    new MethodContext(value :: stack, locals.update(idx, value))
+  }
+
+  private def store(idx: Int, typ: Class[_]) = {
+    val value = stack.head match {
+      case v: KnownValue => v
+      case v: KnownRef => v
+      case _ => KnownType(typ)
+    }
+    new MethodContext(stack.tail, locals.update(idx, value))
+  }
+
+  // We have decided to store 64-bit data as follows:
+  // - stack words: lower bytes at top
+  // - local variables: lower bytes at the lower index
+  //
+  // "Implementors are free to decide the appropriate way to divide a 64-bit data value between two local variables."
+  // [3.6.1, p. 67 in JVMS]
+  //
+  // "Implementors are free to decide the appropriate way to divide a 64-bit data value between two operand stack words."
+  // [3.6.2, p. 67 in JVMS]
+
+  private def load2(idx: Int, typ: Class[_]) = load(idx + 1, typ).load(idx, typ)
+
+  private def store2(idx: Int, typ: Class[_]) = store(idx, typ).store(idx + 1, typ)
+
+
   private def execute(insn: TypeInsnNode) = {
     insn.getOpcode match {
       case _ => this
@@ -132,45 +165,4 @@ class MethodContext(
       case _ => this
     }
   }
-
-  private def push(v: Value) = {
-    new MethodContext(v :: stack, locals)
-  }
-
-  private def pop() = {
-    new MethodContext(stack.tail, locals)
-  }
-
-  private def load(idx: Int, typ: Class[_]) = {
-    val value = locals.get(idx) match {
-      case Some(v: KnownValue) => v
-      case Some(v: KnownRef) => v
-      case _ => KnownType(typ)
-    }
-    new MethodContext(value :: stack, locals.update(idx, value))
-  }
-
-  private def store(idx: Int, typ: Class[_]) = {
-    val value = stack.head match {
-      case v: KnownValue => v
-      case v: KnownRef => v
-      case _ => KnownType(typ)
-    }
-    new MethodContext(stack.tail, locals.update(idx, value))
-  }
-
-  // We have decided to store 64-bit data as follows:
-  // - stack words: lower bytes at top
-  // - local variables: lower bytes at the lower index
-  //
-  // Implementors are free to decide the appropriate way to divide a 64-bit data value between two local variables.
-  // [3.6.1, p. 67 in JVMS]
-  //
-  // Implementors are free to decide the appropriate way to divide a 64-bit data value between two operand stack words.
-  // [3.6.2, p. 67 in JVMS]
-
-  private def load2(idx: Int, typ: Class[_]) = load(idx + 1, typ).load(idx, typ)
-
-  private def store2(idx: Int, typ: Class[_]) = store(idx, typ).store(idx + 1, typ)
-
 }
