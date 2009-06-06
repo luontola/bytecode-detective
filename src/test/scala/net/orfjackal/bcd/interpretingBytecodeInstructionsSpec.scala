@@ -20,7 +20,7 @@ class interpretingBytecodeInstructionsSpec extends Specification {
     }
   }
 
-  "Loading local variables" should {
+  "Loading unset local variables" should {
     def stackAfter(insn: AbstractInsnNode) = {
       val c = new MethodContext()
       c.execute(insn).stack
@@ -114,26 +114,74 @@ class interpretingBytecodeInstructionsSpec extends Specification {
     }
   }
 
-  "Storing local variables" should {
-    def stackAfter(insn: AbstractInsnNode) = {
-      val stackBefore = List(UnknownValue(), UnknownValue())
-      val c = new MethodContext(stackBefore, Map())
-      c.execute(insn).stack
+  "Storing unknown local variables" should {
+    def exec(insn: AbstractInsnNode) = {
+      val stack = List(UnknownValue(), UnknownValue())
+      val locals = Map[Int, Value]()
+      val c = new MethodContext(stack, locals)
+      c.execute(insn)
     }
     "ISTORE" in {
-      stackAfter(new VarInsnNode(Opcodes.ISTORE, 0)) must_== List(UnknownValue())
+      val c = exec(new VarInsnNode(Opcodes.ISTORE, 0))
+      c.stack must_== List(UnknownValue())
+      c.locals must_== Map(
+        0 -> KnownType(classOf[Int]))
     }
     "LSTORE" in {
-      stackAfter(new VarInsnNode(Opcodes.LSTORE, 0)) must_== List()
+      val c = exec(new VarInsnNode(Opcodes.LSTORE, 0))
+      c.stack must_== List()
+      c.locals must_== Map(
+        0 -> KnownType(classOf[Long]),
+        1 -> KnownType(classOf[Long]))
     }
     "FSTORE" in {
-      stackAfter(new VarInsnNode(Opcodes.FSTORE, 0)) must_== List(UnknownValue())
+      val c = exec(new VarInsnNode(Opcodes.FSTORE, 0))
+      c.stack must_== List(UnknownValue())
+      c.locals must_== Map(
+        0 -> KnownType(classOf[Float]))
     }
     "DSTORE" in {
-      stackAfter(new VarInsnNode(Opcodes.DSTORE, 0)) must_== List()
+      val c = exec(new VarInsnNode(Opcodes.DSTORE, 0))
+      c.stack must_== List()
+      c.locals must_== Map(
+        0 -> KnownType(classOf[Double]),
+        1 -> KnownType(classOf[Double]))
     }
     "ASTORE" in {
-      stackAfter(new VarInsnNode(Opcodes.ASTORE, 0)) must_== List(UnknownValue())
+      val c = exec(new VarInsnNode(Opcodes.ASTORE, 0))
+      c.stack must_== List(UnknownValue())
+      c.locals must_== Map(
+        0 -> KnownType(classOf[Object]))
+    }
+  }
+
+  "Storing known local variables" should {
+    def exec(insn: AbstractInsnNode, stack: List[Value]) = {
+      val locals = Map[Int, Value]()
+      val c = new MethodContext(stack, locals)
+      c.execute(insn)
+    }
+    "ISTORE" in {
+      val stack = List(KnownValue(40, classOf[Int]))
+      val c = exec(new VarInsnNode(Opcodes.ISTORE, 0), stack)
+      c.stack must_== List()
+      c.locals must_== Map(
+        0 -> KnownValue(40, classOf[Int]))
+    }
+    "LSTORE" in {
+      val stack = List(KnownValue(50, classOf[Long]), KnownValue(60, classOf[Long]))
+      val c = exec(new VarInsnNode(Opcodes.LSTORE, 0), stack)
+      c.stack must_== List()
+      c.locals must_== Map(
+        0 -> KnownValue(50, classOf[Long]),
+        1 -> KnownValue(60, classOf[Long]))
+    }
+    "ASTORE" in {
+      val stack = List(KnownRef("x", classOf[String]))
+      val c = exec(new VarInsnNode(Opcodes.ASTORE, 0), stack)
+      c.stack must_== List()
+      c.locals must_== Map(
+        0 -> KnownRef("x", classOf[String]))
     }
   }
 

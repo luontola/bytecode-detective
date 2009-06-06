@@ -52,11 +52,11 @@ class MethodContext(
       case Opcodes.FLOAD => load(idx, classOf[Float])
       case Opcodes.DLOAD => load2(idx, classOf[Double])
       case Opcodes.ALOAD => load(idx, classOf[Object])
-      case Opcodes.ISTORE => pop()
-      case Opcodes.LSTORE => pop().pop()
-      case Opcodes.FSTORE => pop()
-      case Opcodes.DSTORE => pop().pop()
-      case Opcodes.ASTORE => pop()
+      case Opcodes.ISTORE => store(idx, classOf[Int])
+      case Opcodes.LSTORE => store2(idx, classOf[Long])
+      case Opcodes.FSTORE => store(idx, classOf[Float])
+      case Opcodes.DSTORE => store2(idx, classOf[Double])
+      case Opcodes.ASTORE => store(idx, classOf[Object])
       case Opcodes.RET => throw new IllegalArgumentException("V1_5 bytecode is not supported")
     }
   }
@@ -150,6 +150,15 @@ class MethodContext(
     new MethodContext(value :: stack, locals.update(idx, value))
   }
 
+  private def store(idx: Int, typ: Class[_]) = {
+    val value = stack.head match {
+      case v: KnownValue => v
+      case v: KnownRef => v
+      case _ => KnownType(typ)
+    }
+    new MethodContext(stack.tail, locals.update(idx, value))
+  }
+
   // We have decided to store 64-bit data as follows:
   // - stack words: lower bytes at top
   // - local variables: lower bytes at the lower index
@@ -161,5 +170,7 @@ class MethodContext(
   // [3.6.2, p. 67 in JVMS]
 
   private def load2(idx: Int, typ: Class[_]) = load(idx + 1, typ).load(idx, typ)
+
+  private def store2(idx: Int, typ: Class[_]) = store(idx, typ).store(idx + 1, typ)
 
 }
