@@ -8,7 +8,7 @@ import org.objectweb.asm.tree._
 import org.specs._
 import org.specs.runner._
 
-class interpretingLocalVariableInsnSpec extends Specification {
+object interpretLocalVariableSpec extends Specification {
   "Loading unknown local variables" should {
     def exec(insn: AbstractInsnNode) = {
       val stack = List()

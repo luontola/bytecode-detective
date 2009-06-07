@@ -8,10 +8,16 @@ import org.specs.runner._
 
 object allSpecs extends Specification {
   "Interpreting bytecode instructions" isSpecifiedBy (
-          new interpretingSpec,
-          new interpretingLocalVariableInsnSpec,
-          new interpretingStackInsnSpec
-          )
+          interpretSpec,
+          interpretLocalVariableSpec,
+          interpretStackSpec,
+          interpretConstantSpec,
+          interpretArithmeticLogicSpec,
+          interpretCastSpec,
+          interpretObjectFieldMethodSpec,
+          interpretArraySpec,
+          interpretJumpSpec,
+          interpretReturnSpec)
 }
 
 class allSuite extends JUnit4(allSpecs)

@@ -8,7 +8,7 @@ import org.objectweb.asm.tree._
 import org.specs._
 import org.specs.runner._
 
-class interpretingSpec extends Specification {
+object interpretSpec extends Specification {
   "When no commands have been executed" should {
     "the stack is empty" in {
       var c = new MethodContext()

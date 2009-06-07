@@ -8,7 +8,7 @@ import org.objectweb.asm.tree._
 import org.specs._
 import org.specs.runner._
 
-class interpretingStackInsnSpec extends Specification {
+object interpretStackSpec extends Specification {
   "Operating the stack" should {
     def exec(insn: AbstractInsnNode) = {
       val stack = List(
