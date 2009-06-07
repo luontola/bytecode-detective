@@ -236,34 +236,70 @@ class MethodContext(
 
   private def execute(insn: TypeInsnNode) = {
     insn.getOpcode match {
-      case _ => this
+    // TODO
+      case Opcodes.NEW => this
+      case Opcodes.ANEWARRAY => this
+      // TODO
+      case Opcodes.CHECKCAST => this
+      case Opcodes.INSTANCEOF => this
     }
   }
+
 
   private def execute(insn: FieldInsnNode) = {
     insn.getOpcode match {
-      case _ => this
+    // TODO
+      case Opcodes.GETSTATIC => this
+      case Opcodes.PUTSTATIC => this
+      case Opcodes.GETFIELD => this
+      case Opcodes.PUTFIELD => this
     }
   }
+
 
   private def execute(insn: MethodInsnNode) = {
     insn.getOpcode match {
-      case _ => this
+    // TODO
+      case Opcodes.INVOKEVIRTUAL => this
+      case Opcodes.INVOKESPECIAL => this
+      case Opcodes.INVOKESTATIC => this
+      case Opcodes.INVOKEINTERFACE => this
     }
   }
+
 
   private def execute(insn: JumpInsnNode) = {
     insn.getOpcode match {
-    // Subroutines
+    // TODO
+      case Opcodes.IFEQ => this
+      case Opcodes.IFNE => this
+      case Opcodes.IFLT => this
+      case Opcodes.IFGE => this
+      case Opcodes.IFGT => this
+      case Opcodes.IFLE => this
+      case Opcodes.IF_ICMPEQ => this
+      case Opcodes.IF_ICMPNE => this
+      case Opcodes.IF_ICMPLT => this
+      case Opcodes.IF_ICMPGE => this
+      case Opcodes.IF_ICMPGT => this
+      case Opcodes.IF_ICMPLE => this
+      case Opcodes.IF_ACMPEQ => this
+      case Opcodes.IF_ACMPNE => this
+      case Opcodes.GOTO => this
+      // Subroutines
       case Opcodes.JSR => throw new IllegalArgumentException("V1_5 bytecode is not supported")
+      // TODO
+      case Opcodes.IFNULL => this
+      case Opcodes.IFNONNULL => this
     }
   }
 
+
   private def execute(insn: LabelNode) = {
-    insn.getOpcode match {
-      case _ => this
-    }
+    // TODO
+    this
   }
+
 
   private def execute(insn: LdcInsnNode) = {
     assert(insn.getOpcode == Opcodes.LDC)
@@ -278,39 +314,50 @@ class MethodContext(
     }
   }
 
+
   private def execute(insn: IincInsnNode) = {
-    insn.getOpcode match {
-      case _ => this
-    }
+    assert(insn.getOpcode == Opcodes.IINC)
+    // TODO
+    this
   }
+
 
   private def execute(insn: TableSwitchInsnNode) = {
-    insn.getOpcode match {
-      case _ => this
-    }
+    assert(insn.getOpcode == Opcodes.TABLESWITCH)
+    // TODO
+    this
   }
+
 
   private def execute(insn: LookupSwitchInsnNode) = {
-    insn.getOpcode match {
-      case _ => this
-    }
+    assert(insn.getOpcode == Opcodes.LOOKUPSWITCH)
+    // TODO
+    this
   }
+
 
   private def execute(insn: MultiANewArrayInsnNode) = {
-    insn.getOpcode match {
-      case _ => this
-    }
+    assert(insn.getOpcode == Opcodes.MULTIANEWARRAY)
+    // TODO
+    this
   }
+
 
   private def execute(insn: FrameNode) = {
-    insn.getOpcode match {
-      case _ => this
+    insn.`type` match {
+    // TODO
+      case Opcodes.F_NEW => this
+      case Opcodes.F_FULL => this
+      case Opcodes.F_APPEND => this
+      case Opcodes.F_CHOP => this
+      case Opcodes.F_SAME => this
+      case Opcodes.F_SAME1 => this
     }
   }
 
+
   private def execute(insn: LineNumberNode) = {
-    insn.getOpcode match {
-      case _ => this
-    }
+    // TODO
+    this
   }
 }
