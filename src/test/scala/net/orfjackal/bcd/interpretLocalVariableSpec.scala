@@ -46,8 +46,8 @@ object interpretLocalVariableSpec extends Specification {
       val stack = List()
       val locals = Map[Int, Value](
         0 -> KnownValue(40, classOf[Int]),
-        1 -> KnownValue(50, classOf[Long]),
-        2 -> KnownValue(60, classOf[Long]),
+        1 -> KnownValue(50L, classOf[Long]),
+        2 -> KnownValue(60L, classOf[Long]),
         3 -> KnownRef("x", classOf[String]))
       val c = new MethodContext(stack, locals)
       c.execute(insn)
@@ -57,17 +57,17 @@ object interpretLocalVariableSpec extends Specification {
       c.stack must_== List(KnownValue(40, classOf[Int]))
       c.locals must_== Map(
         0 -> KnownValue(40, classOf[Int]),
-        1 -> KnownValue(50, classOf[Long]),
-        2 -> KnownValue(60, classOf[Long]),
+        1 -> KnownValue(50L, classOf[Long]),
+        2 -> KnownValue(60L, classOf[Long]),
         3 -> KnownRef("x", classOf[String]))
     }
     "LLOAD" in {
       val c = exec(new VarInsnNode(Opcodes.LLOAD, 1))
-      c.stack must_== List(KnownValue(50, classOf[Long]), KnownValue(60, classOf[Long]))
+      c.stack must_== List(KnownValue(50L, classOf[Long]), KnownValue(60L, classOf[Long]))
       c.locals must_== Map(
         0 -> KnownValue(40, classOf[Int]),
-        1 -> KnownValue(50, classOf[Long]),
-        2 -> KnownValue(60, classOf[Long]),
+        1 -> KnownValue(50L, classOf[Long]),
+        2 -> KnownValue(60L, classOf[Long]),
         3 -> KnownRef("x", classOf[String]))
     }
     "ALOAD" in {
@@ -75,8 +75,8 @@ object interpretLocalVariableSpec extends Specification {
       c.stack must_== List(KnownRef("x", classOf[String]))
       c.locals must_== Map(
         0 -> KnownValue(40, classOf[Int]),
-        1 -> KnownValue(50, classOf[Long]),
-        2 -> KnownValue(60, classOf[Long]),
+        1 -> KnownValue(50L, classOf[Long]),
+        2 -> KnownValue(60L, classOf[Long]),
         3 -> KnownRef("x", classOf[String]))
     }
   }
@@ -123,12 +123,12 @@ object interpretLocalVariableSpec extends Specification {
         0 -> KnownValue(40, classOf[Int]))
     }
     "LSTORE" in {
-      val stack = List(KnownValue(50, classOf[Long]), KnownValue(60, classOf[Long]))
+      val stack = List(KnownValue(50L, classOf[Long]), KnownValue(60L, classOf[Long]))
       val c = exec(new VarInsnNode(Opcodes.LSTORE, 0), stack)
       c.stack must_== List()
       c.locals must_== Map(
-        0 -> KnownValue(50, classOf[Long]),
-        1 -> KnownValue(60, classOf[Long]))
+        0 -> KnownValue(50L, classOf[Long]),
+        1 -> KnownValue(60L, classOf[Long]))
     }
     "ASTORE" in {
       val stack = List(KnownRef("x", classOf[String]))
