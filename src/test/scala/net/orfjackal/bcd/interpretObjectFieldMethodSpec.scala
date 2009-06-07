@@ -10,18 +10,18 @@ import org.specs.runner._
 
 object interpretObjectFieldMethodSpec extends Specification {
   "Operating objects" should {
-
+    // TODO
   }
 
   "Getting values from fields" should {
-
+    // TODO
   }
 
   "Putting values to fields" should {
-
+    // TODO
   }
 
   "Invoking methods" should {
-
+    // TODO
   }
 }

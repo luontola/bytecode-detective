@@ -10,10 +10,10 @@ import org.specs.runner._
 
 object interpretArithmeticLogicSpec extends Specification {
   "Executing arithmetics" should {
-
+    // TODO
   }
 
   "Executing logic" should {
-
+    // TODO
   }
 }

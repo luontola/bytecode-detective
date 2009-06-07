@@ -10,14 +10,14 @@ import org.specs.runner._
 
 object interpretArraySpec extends Specification {
   "Operating arrays" should {
-
+    // TODO
   }
 
   "Loading from arrays" should {
-
+    // TODO
   }
 
   "Storing to arrays" should {
-
+    // TODO
   }
 }
