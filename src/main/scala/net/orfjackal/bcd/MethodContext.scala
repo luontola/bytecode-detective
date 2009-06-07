@@ -32,17 +32,41 @@ class MethodContext(
     }
   }
 
+
   private def execute(insn: InsnNode) = {
     insn.getOpcode match {
+      case Opcodes.POP => pop()
+      case Opcodes.POP2 => pop().pop()
+      case Opcodes.DUP => dup()
+      case Opcodes.DUP_X1 => dup_x(1)
+      case Opcodes.DUP_X2 => dup_x(2)
+      case Opcodes.DUP2 => dup2()
+      case Opcodes.DUP2_X1 => dup2_x(1)
+      case Opcodes.DUP2_X2 => dup2_x(2)
+      case Opcodes.SWAP => swap()
       case _ => this
     }
   }
+
+  private def pop() = new MethodContext(stack.tail, locals)
+
+  private def dup() = new MethodContext(stack.head :: stack, locals)
+
+  private def dup_x(n: Int) = new MethodContext(stack.take(n + 1) ::: stack.head :: stack.drop(n + 1), locals)
+
+  private def dup2() = new MethodContext(stack.take(2) ::: stack, locals)
+
+  private def dup2_x(n: Int) = new MethodContext(stack.take(n + 2) ::: stack.take(2) ::: stack.drop(n + 2), locals)
+
+  private def swap() = new MethodContext(stack.tail.head :: stack.head :: stack.drop(2), locals)
+
 
   private def execute(insn: IntInsnNode) = {
     insn.getOpcode match {
       case _ => this
     }
   }
+
 
   private def execute(insn: VarInsnNode) = {
     val idx = insn.`var`

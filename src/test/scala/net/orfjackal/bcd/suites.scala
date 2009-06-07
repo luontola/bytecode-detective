@@ -7,9 +7,10 @@ import org.specs._
 import org.specs.runner._
 
 object allSpecs extends Specification {
-  "All specs" areSpecifiedBy (
+  "Interpreting bytecode instructions" isSpecifiedBy (
           new interpretingSpec,
-          new interpretingVarInsnSpec
+          new interpretingLocalVariableInsnSpec,
+          new interpretingStackInsnSpec
           )
 }
 
