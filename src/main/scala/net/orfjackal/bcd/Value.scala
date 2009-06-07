@@ -5,6 +5,6 @@ package net.orfjackal.bcd
 
 sealed abstract class Value
 case class UnknownValue() extends Value
-case class KnownType(t: Class[_]) extends Value
-case class KnownValue[T <: AnyVal](value: T, typ: Class[T]) extends KnownType(typ)
-case class KnownRef[T <: AnyRef](ref: T, typ: Class[T]) extends KnownType(typ)
+case class KnownType(typ: Class[_]) extends Value
+case class KnownValue[T <: AnyVal](value: T, _typ: Class[T]) extends KnownType(_typ)
+case class KnownRef[T <: AnyRef](ref: T, _typ: Class[T]) extends KnownType(_typ)

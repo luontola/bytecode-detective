@@ -213,6 +213,7 @@ class MethodContext(
       case Some(v: KnownRef[_]) => v
       case _ => KnownType(typ)
     }
+    assert(typ isAssignableFrom value.typ, "expected '" + typ + "' at " + idx + " but found " + value)
     new MethodContext(value :: stack, locals.update(idx, value))
   }
 
@@ -222,6 +223,7 @@ class MethodContext(
       case v: KnownRef[_] => v
       case _ => KnownType(typ)
     }
+    assert(typ isAssignableFrom value.typ, "expected '" + typ + "' at " + idx + " but found " + value)
     new MethodContext(stack.tail, locals.update(idx, value))
   }
 
