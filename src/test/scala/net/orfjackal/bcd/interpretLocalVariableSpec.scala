@@ -32,6 +32,20 @@ object interpretLocalVariableSpec extends Specification {
         0 -> KnownType(classOf[Long]),
         1 -> KnownType(classOf[Long]))
     }
+    "FLOAD" in {
+      val c = exec(new VarInsnNode(Opcodes.FLOAD, 0))
+      c.stack must_== List(KnownType(classOf[Float]))
+      c.locals must_== Map(
+        0 -> KnownType(classOf[Float]),
+        1 -> UnknownValue())
+    }
+    "DLOAD" in {
+      val c = exec(new VarInsnNode(Opcodes.DLOAD, 0))
+      c.stack must_== List(KnownType(classOf[Double]), KnownType(classOf[Double]))
+      c.locals must_== Map(
+        0 -> KnownType(classOf[Double]),
+        1 -> KnownType(classOf[Double]))
+    }
     "ALOAD" in {
       val c = exec(new VarInsnNode(Opcodes.ALOAD, 0))
       c.stack must_== List(KnownType(classOf[Object]))
@@ -42,42 +56,42 @@ object interpretLocalVariableSpec extends Specification {
   }
 
   "Loading known local variables" should {
+    // In reality, the system will store each 64-bit value (long, double) duplicated
+    // to each local variable slot, so that the interpreter would be simpler, but
+    // in this test we use different values, so that we could test that their order
+    // is not accidentally swapped.
     def exec(insn: AbstractInsnNode) = {
       val stack = List()
       val locals = Map[Int, Value](
-        0 -> KnownValue(40, classOf[Int]),
-        1 -> KnownValue(50L, classOf[Long]),
-        2 -> KnownValue(60L, classOf[Long]),
-        3 -> KnownRef("x", classOf[String]))
+        0 -> KnownValue(10, classOf[Int]),
+        1 -> KnownValue(11L, classOf[Long]),
+        2 -> KnownValue(12L, classOf[Long]),
+        3 -> KnownValue(1.3F, classOf[Float]),
+        4 -> KnownValue(1.4, classOf[Double]),
+        5 -> KnownValue(1.5, classOf[Double]),
+        6 -> KnownRef("x", classOf[String]))
       val c = new MethodContext(stack, locals)
-      c.execute(insn)
+      val c2 = c.execute(insn)
+      c2.locals must_== locals
+      c2
+    }
+    def stackAfter(insn: AbstractInsnNode) = {
+      exec(insn).stack
     }
     "ILOAD" in {
-      val c = exec(new VarInsnNode(Opcodes.ILOAD, 0))
-      c.stack must_== List(KnownValue(40, classOf[Int]))
-      c.locals must_== Map(
-        0 -> KnownValue(40, classOf[Int]),
-        1 -> KnownValue(50L, classOf[Long]),
-        2 -> KnownValue(60L, classOf[Long]),
-        3 -> KnownRef("x", classOf[String]))
+      stackAfter(new VarInsnNode(Opcodes.ILOAD, 0)) must_== List(KnownValue(10, classOf[Int]))
     }
     "LLOAD" in {
-      val c = exec(new VarInsnNode(Opcodes.LLOAD, 1))
-      c.stack must_== List(KnownValue(50L, classOf[Long]), KnownValue(60L, classOf[Long]))
-      c.locals must_== Map(
-        0 -> KnownValue(40, classOf[Int]),
-        1 -> KnownValue(50L, classOf[Long]),
-        2 -> KnownValue(60L, classOf[Long]),
-        3 -> KnownRef("x", classOf[String]))
+      stackAfter(new VarInsnNode(Opcodes.LLOAD, 1)) must_== List(KnownValue(11L, classOf[Long]), KnownValue(12L, classOf[Long]))
+    }
+    "FLOAD" in {
+      stackAfter(new VarInsnNode(Opcodes.FLOAD, 3)) must_== List(KnownValue(1.3F, classOf[Float]))
+    }
+    "DLOAD" in {
+      stackAfter(new VarInsnNode(Opcodes.DLOAD, 4)) must_== List(KnownValue(1.4, classOf[Double]), KnownValue(1.5, classOf[Double]))
     }
     "ALOAD" in {
-      val c = exec(new VarInsnNode(Opcodes.ALOAD, 3))
-      c.stack must_== List(KnownRef("x", classOf[String]))
-      c.locals must_== Map(
-        0 -> KnownValue(40, classOf[Int]),
-        1 -> KnownValue(50L, classOf[Long]),
-        2 -> KnownValue(60L, classOf[Long]),
-        3 -> KnownRef("x", classOf[String]))
+      stackAfter(new VarInsnNode(Opcodes.ALOAD, 6)) must_== List(KnownRef("x", classOf[String]))
     }
   }
 
@@ -101,6 +115,19 @@ object interpretLocalVariableSpec extends Specification {
         0 -> KnownType(classOf[Long]),
         1 -> KnownType(classOf[Long]))
     }
+    "FSTORE" in {
+      val c = exec(new VarInsnNode(Opcodes.FSTORE, 0))
+      c.stack must_== List(UnknownValue())
+      c.locals must_== Map(
+        0 -> KnownType(classOf[Float]))
+    }
+    "DSTORE" in {
+      val c = exec(new VarInsnNode(Opcodes.DSTORE, 0))
+      c.stack must_== List()
+      c.locals must_== Map(
+        0 -> KnownType(classOf[Double]),
+        1 -> KnownType(classOf[Double]))
+    }
     "ASTORE" in {
       val c = exec(new VarInsnNode(Opcodes.ASTORE, 0))
       c.stack must_== List(UnknownValue())
@@ -116,19 +143,34 @@ object interpretLocalVariableSpec extends Specification {
       c.execute(insn)
     }
     "ISTORE" in {
-      val stack = List(KnownValue(40, classOf[Int]))
+      val stack = List(KnownValue(10, classOf[Int]))
       val c = exec(new VarInsnNode(Opcodes.ISTORE, 0), stack)
       c.stack must_== List()
       c.locals must_== Map(
-        0 -> KnownValue(40, classOf[Int]))
+        0 -> KnownValue(10, classOf[Int]))
     }
     "LSTORE" in {
-      val stack = List(KnownValue(50L, classOf[Long]), KnownValue(60L, classOf[Long]))
+      val stack = List(KnownValue(11L, classOf[Long]), KnownValue(12L, classOf[Long]))
       val c = exec(new VarInsnNode(Opcodes.LSTORE, 0), stack)
       c.stack must_== List()
       c.locals must_== Map(
-        0 -> KnownValue(50L, classOf[Long]),
-        1 -> KnownValue(60L, classOf[Long]))
+        0 -> KnownValue(11L, classOf[Long]),
+        1 -> KnownValue(12L, classOf[Long]))
+    }
+    "FSTORE" in {
+      val stack = List(KnownValue(1.3F, classOf[Float]))
+      val c = exec(new VarInsnNode(Opcodes.FSTORE, 0), stack)
+      c.stack must_== List()
+      c.locals must_== Map(
+        0 -> KnownValue(1.3F, classOf[Float]))
+    }
+    "DSTORE" in {
+      val stack = List(KnownValue(1.4, classOf[Double]), KnownValue(1.5, classOf[Double]))
+      val c = exec(new VarInsnNode(Opcodes.DSTORE, 0), stack)
+      c.stack must_== List()
+      c.locals must_== Map(
+        0 -> KnownValue(1.4, classOf[Double]),
+        1 -> KnownValue(1.5, classOf[Double]))
     }
     "ASTORE" in {
       val stack = List(KnownRef("x", classOf[String]))
