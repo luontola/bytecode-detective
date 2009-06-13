@@ -112,43 +112,43 @@ class MethodContext(
       case Opcodes.DUP2_X1 => dup2_x(1)
       case Opcodes.DUP2_X2 => dup2_x(2)
       case Opcodes.SWAP => swap()
-      // TODO
-      case Opcodes.IADD => this
-      case Opcodes.LADD => this
-      case Opcodes.FADD => this
-      case Opcodes.DADD => this
-      case Opcodes.ISUB => this
-      case Opcodes.LSUB => this
-      case Opcodes.FSUB => this
-      case Opcodes.DSUB => this
-      case Opcodes.IMUL => this
-      case Opcodes.LMUL => this
-      case Opcodes.FMUL => this
-      case Opcodes.DMUL => this
-      case Opcodes.IDIV => this
-      case Opcodes.LDIV => this
-      case Opcodes.FDIV => this
-      case Opcodes.DDIV => this
-      case Opcodes.IREM => this
-      case Opcodes.LREM => this
-      case Opcodes.FREM => this
-      case Opcodes.DREM => this
-      case Opcodes.INEG => this
-      case Opcodes.LNEG => this
-      case Opcodes.FNEG => this
-      case Opcodes.DNEG => this
-      case Opcodes.ISHL => this
-      case Opcodes.LSHL => this
-      case Opcodes.ISHR => this
-      case Opcodes.LSHR => this
-      case Opcodes.IUSHR => this
-      case Opcodes.LUSHR => this
-      case Opcodes.IAND => this
-      case Opcodes.LAND => this
-      case Opcodes.IOR => this
-      case Opcodes.LOR => this
-      case Opcodes.IXOR => this
-      case Opcodes.LXOR => this
+      // Arithmetic
+      case Opcodes.IADD => icalc()
+      case Opcodes.LADD => lcalc()
+      case Opcodes.FADD => fcalc()
+      case Opcodes.DADD => dcalc()
+      case Opcodes.ISUB => icalc()
+      case Opcodes.LSUB => lcalc()
+      case Opcodes.FSUB => fcalc()
+      case Opcodes.DSUB => dcalc()
+      case Opcodes.IMUL => icalc()
+      case Opcodes.LMUL => lcalc()
+      case Opcodes.FMUL => fcalc()
+      case Opcodes.DMUL => dcalc()
+      case Opcodes.IDIV => icalc()
+      case Opcodes.LDIV => lcalc()
+      case Opcodes.FDIV => fcalc()
+      case Opcodes.DDIV => dcalc()
+      case Opcodes.IREM => icalc()
+      case Opcodes.LREM => lcalc()
+      case Opcodes.FREM => fcalc()
+      case Opcodes.DREM => dcalc()
+      case Opcodes.INEG => ineg()
+      case Opcodes.LNEG => lneg()
+      case Opcodes.FNEG => fneg()
+      case Opcodes.DNEG => dneg()
+      case Opcodes.ISHL => icalc()
+      case Opcodes.LSHL => lcalc()
+      case Opcodes.ISHR => icalc()
+      case Opcodes.LSHR => lcalc()
+      case Opcodes.IUSHR => icalc()
+      case Opcodes.LUSHR => lcalc()
+      case Opcodes.IAND => icalc()
+      case Opcodes.LAND => lcalc()
+      case Opcodes.IOR => icalc()
+      case Opcodes.LOR => lcalc()
+      case Opcodes.IXOR => icalc()
+      case Opcodes.LXOR => lcalc()
       // TODO
       case Opcodes.I2L => this
       case Opcodes.I2F => this
@@ -165,11 +165,12 @@ class MethodContext(
       case Opcodes.I2B => this
       case Opcodes.I2C => this
       case Opcodes.I2S => this
-      case Opcodes.LCMP => this
-      case Opcodes.FCMPL => this
-      case Opcodes.FCMPG => this
-      case Opcodes.DCMPL => this
-      case Opcodes.DCMPG => this
+      // Logic
+      case Opcodes.LCMP => lcmp()
+      case Opcodes.FCMPL => fcmp()
+      case Opcodes.FCMPG => fcmp()
+      case Opcodes.DCMPL => dcmp()
+      case Opcodes.DCMPG => dcmp()
       // TODO
       case Opcodes.IRETURN => this
       case Opcodes.LRETURN => this
@@ -364,33 +365,6 @@ class MethodContext(
   }
 
 
-  // Constants
-
-  private def aconst[T <: AnyRef](value: T, typ: Class[T]) = push(new KnownRef(value, typ))
-
-  private def const[T <: AnyVal](value: T, typ: Class[T]) = push(new KnownValue(value, typ))
-
-  // 64-bit data is duplicated instead of split, so that processing the values would be easier
-  private def const2[T <: AnyVal](value: T, typ: Class[T]) = const(value, typ).const(value, typ)
-
-  // Stack
-
-  private def push(value: Value) = new MethodContext(value :: stack, locals)
-
-  private def pop() = new MethodContext(stack.tail, locals)
-
-  private def pop2() = new MethodContext(stack.drop(2), locals)
-
-  private def dup() = new MethodContext(stack.head :: stack, locals)
-
-  private def dup_x(n: Int) = new MethodContext(stack.take(n + 1) ::: stack.head :: stack.drop(n + 1), locals)
-
-  private def dup2() = new MethodContext(stack.take(2) ::: stack, locals)
-
-  private def dup2_x(n: Int) = new MethodContext(stack.take(n + 2) ::: stack.take(2) ::: stack.drop(n + 2), locals)
-
-  private def swap() = new MethodContext(stack.tail.head :: stack.head :: stack.drop(2), locals)
-
   // Local variables
 
   private def load(idx: Int, typ: Class[_]) = {
@@ -420,5 +394,60 @@ class MethodContext(
   private def load2(idx: Int, typ: Class[_]) = load(idx + 1, typ).load(idx, typ)
 
   private def store2(idx: Int, typ: Class[_]) = store(idx, typ).store(idx + 1, typ)
+
+  // Stack
+
+  private def push(value: Value) = new MethodContext(value :: stack, locals)
+
+  private def push2(value: Value) = push(value).push(value)
+
+  private def pop() = new MethodContext(stack.tail, locals)
+
+  private def pop2() = new MethodContext(stack.drop(2), locals)
+
+  private def dup() = new MethodContext(stack.head :: stack, locals)
+
+  private def dup_x(n: Int) = new MethodContext(stack.take(n + 1) ::: stack.head :: stack.drop(n + 1), locals)
+
+  private def dup2() = new MethodContext(stack.take(2) ::: stack, locals)
+
+  private def dup2_x(n: Int) = new MethodContext(stack.take(n + 2) ::: stack.take(2) ::: stack.drop(n + 2), locals)
+
+  private def swap() = new MethodContext(stack.tail.head :: stack.head :: stack.drop(2), locals)
+
+  // Constants
+
+  private def aconst[T <: AnyRef](value: T, typ: Class[T]) = push(new KnownRef(value, typ))
+
+  private def const[T <: AnyVal](value: T, typ: Class[T]) = push(new KnownValue(value, typ))
+
+  // 64-bit data is duplicated instead of split, so that processing the values would be easier
+  private def const2[T <: AnyVal](value: T, typ: Class[T]) = const(value, typ).const(value, typ)
+
+  // Arithmetics
+
+  private def icalc() = pop().pop().push(KnownType(classOf[Int]))
+
+  private def lcalc() = pop2().pop2().push2(KnownType(classOf[Long]))
+
+  private def fcalc() = pop().pop().push(KnownType(classOf[Float]))
+
+  private def dcalc() = pop2().pop2().push2(KnownType(classOf[Double]))
+
+  private def ineg() = pop().push(KnownType(classOf[Int]))
+
+  private def lneg() = pop2().push2(KnownType(classOf[Long]))
+
+  private def fneg() = pop().push(KnownType(classOf[Float]))
+
+  private def dneg() = pop2().push2(KnownType(classOf[Double]))
+
+  // Logic
+
+  private def lcmp() = pop2().pop2().push(KnownType(classOf[Int]))
+
+  private def fcmp() = pop().pop().push(KnownType(classOf[Int]))
+
+  private def dcmp() = pop2().pop2().push(KnownType(classOf[Int]))
 
 }
