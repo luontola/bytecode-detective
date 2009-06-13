@@ -204,30 +204,6 @@ class MethodContext(
     }
   }
 
-  private def aconst[T <: AnyRef](value: T, typ: Class[T]) = push(new KnownRef(value, typ))
-
-  private def const[T <: AnyVal](value: T, typ: Class[T]) = push(new KnownValue(value, typ))
-
-  // 64-bit data is duplicated instead of split, so that processing the values would be easier
-  private def const2[T <: AnyVal](value: T, typ: Class[T]) = const(value, typ).const(value, typ)
-
-  private def push(value: Value) = new MethodContext(value :: stack, locals)
-
-  private def pop() = new MethodContext(stack.tail, locals)
-
-  private def pop2() = new MethodContext(stack.drop(2), locals)
-
-  private def dup() = new MethodContext(stack.head :: stack, locals)
-
-  private def dup_x(n: Int) = new MethodContext(stack.take(n + 1) ::: stack.head :: stack.drop(n + 1), locals)
-
-  private def dup2() = new MethodContext(stack.take(2) ::: stack, locals)
-
-  private def dup2_x(n: Int) = new MethodContext(stack.take(n + 2) ::: stack.take(2) ::: stack.drop(n + 2), locals)
-
-  private def swap() = new MethodContext(stack.tail.head :: stack.head :: stack.drop(2), locals)
-
-
   private def updateValues(insn: IntInsnNode) = {
     insn.getOpcode match {
     // Constants
@@ -237,7 +213,6 @@ class MethodContext(
       case Opcodes.NEWARRAY => this
     }
   }
-
 
   private def updateValues(insn: VarInsnNode) = {
     val idx = insn.`var`
@@ -258,35 +233,6 @@ class MethodContext(
     }
   }
 
-  private def load(idx: Int, typ: Class[_]) = {
-    val value = locals.get(idx) match {
-      case Some(v: KnownValue[_]) => v
-      case Some(v: KnownRef[_]) => v
-      case _ => KnownType(typ)
-    }
-    assert(typ isAssignableFrom value.typ, "expected '" + typ + "' at " + idx + " but found " + value)
-    new MethodContext(value :: stack, locals.update(idx, value))
-  }
-
-  private def store(idx: Int, typ: Class[_]) = {
-    val value = stack.head match {
-      case v: KnownValue[_] => v
-      case v: KnownRef[_] => v
-      case _ => KnownType(typ)
-    }
-    assert(typ isAssignableFrom value.typ, "expected '" + typ + "' at " + idx + " but found " + value)
-    new MethodContext(stack.tail, locals.update(idx, value))
-  }
-
-  // "Implementors are free to decide the appropriate way to divide a 64-bit data value between two local variables."
-  // [3.6.1, p. 67 in JVMS]
-  // "Implementors are free to decide the appropriate way to divide a 64-bit data value between two operand stack words."
-  // [3.6.2, p. 67 in JVMS]
-  private def load2(idx: Int, typ: Class[_]) = load(idx + 1, typ).load(idx, typ)
-
-  private def store2(idx: Int, typ: Class[_]) = store(idx, typ).store(idx + 1, typ)
-
-
   private def updateValues(insn: TypeInsnNode) = {
     insn.getOpcode match {
     // TODO
@@ -298,7 +244,6 @@ class MethodContext(
     }
   }
 
-
   private def updateValues(insn: FieldInsnNode) = {
     insn.getOpcode match {
     // TODO
@@ -309,7 +254,6 @@ class MethodContext(
     }
   }
 
-
   private def updateValues(insn: MethodInsnNode) = {
     insn.getOpcode match {
     // TODO
@@ -319,7 +263,6 @@ class MethodContext(
       case Opcodes.INVOKEINTERFACE => this
     }
   }
-
 
   private def updateValues(insn: JumpInsnNode) = {
     insn.getOpcode match {
@@ -355,12 +298,10 @@ class MethodContext(
     }
   }
 
-
   private def updateValues(insn: LabelNode) = {
     // TODO
     this
   }
-
 
   private def updateValues(insn: LdcInsnNode) = {
     assert(insn.getOpcode == Opcodes.LDC)
@@ -375,13 +316,11 @@ class MethodContext(
     }
   }
 
-
   private def updateValues(insn: IincInsnNode) = {
     assert(insn.getOpcode == Opcodes.IINC)
     // TODO
     this
   }
-
 
   private def updateValues(insn: TableSwitchInsnNode) = {
     assert(insn.getOpcode == Opcodes.TABLESWITCH)
@@ -392,7 +331,6 @@ class MethodContext(
     this withNext (List(insn.dflt) ++ insn.labels.toArray(Array[LabelNode]()))
   }
 
-
   private def updateValues(insn: LookupSwitchInsnNode) = {
     assert(insn.getOpcode == Opcodes.LOOKUPSWITCH)
     pop()
@@ -402,13 +340,11 @@ class MethodContext(
     this withNext (List(insn.dflt) ++ insn.labels.toArray(Array[LabelNode]()))
   }
 
-
   private def updateValues(insn: MultiANewArrayInsnNode) = {
     assert(insn.getOpcode == Opcodes.MULTIANEWARRAY)
     // TODO
     this
   }
-
 
   private def updateValues(insn: FrameNode) = {
     insn.`type` match {
@@ -422,9 +358,67 @@ class MethodContext(
     }
   }
 
-
   private def updateValues(insn: LineNumberNode) = {
     // TODO
     this
   }
+
+
+  // Constants
+
+  private def aconst[T <: AnyRef](value: T, typ: Class[T]) = push(new KnownRef(value, typ))
+
+  private def const[T <: AnyVal](value: T, typ: Class[T]) = push(new KnownValue(value, typ))
+
+  // 64-bit data is duplicated instead of split, so that processing the values would be easier
+  private def const2[T <: AnyVal](value: T, typ: Class[T]) = const(value, typ).const(value, typ)
+
+  // Stack
+
+  private def push(value: Value) = new MethodContext(value :: stack, locals)
+
+  private def pop() = new MethodContext(stack.tail, locals)
+
+  private def pop2() = new MethodContext(stack.drop(2), locals)
+
+  private def dup() = new MethodContext(stack.head :: stack, locals)
+
+  private def dup_x(n: Int) = new MethodContext(stack.take(n + 1) ::: stack.head :: stack.drop(n + 1), locals)
+
+  private def dup2() = new MethodContext(stack.take(2) ::: stack, locals)
+
+  private def dup2_x(n: Int) = new MethodContext(stack.take(n + 2) ::: stack.take(2) ::: stack.drop(n + 2), locals)
+
+  private def swap() = new MethodContext(stack.tail.head :: stack.head :: stack.drop(2), locals)
+
+  // Local variables
+
+  private def load(idx: Int, typ: Class[_]) = {
+    val value = locals.get(idx) match {
+      case Some(v: KnownValue[_]) => v
+      case Some(v: KnownRef[_]) => v
+      case _ => KnownType(typ)
+    }
+    assert(typ isAssignableFrom value.typ, "expected '" + typ + "' at " + idx + " but found " + value)
+    new MethodContext(value :: stack, locals.update(idx, value))
+  }
+
+  private def store(idx: Int, typ: Class[_]) = {
+    val value = stack.head match {
+      case v: KnownValue[_] => v
+      case v: KnownRef[_] => v
+      case _ => KnownType(typ)
+    }
+    assert(typ isAssignableFrom value.typ, "expected '" + typ + "' at " + idx + " but found " + value)
+    new MethodContext(stack.tail, locals.update(idx, value))
+  }
+
+  // "Implementors are free to decide the appropriate way to divide a 64-bit data value between two local variables."
+  // [3.6.1, p. 67 in JVMS]
+  // "Implementors are free to decide the appropriate way to divide a 64-bit data value between two operand stack words."
+  // [3.6.2, p. 67 in JVMS]
+  private def load2(idx: Int, typ: Class[_]) = load(idx + 1, typ).load(idx, typ)
+
+  private def store2(idx: Int, typ: Class[_]) = store(idx, typ).store(idx + 1, typ)
+
 }
