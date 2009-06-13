@@ -62,8 +62,6 @@ object interpretJumpSpec extends Specification {
       list.add(sw1)
       list.add(sw2)
       list.add(sw3)
-      //      list.add(table)
-      //      list.add(lookup)
 
       val stack = List(UnknownValue(), UnknownValue())
       val c = new MethodContext(stack, Map.empty)
