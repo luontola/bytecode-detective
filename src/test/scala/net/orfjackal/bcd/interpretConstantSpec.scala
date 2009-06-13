@@ -16,7 +16,7 @@ object interpretConstantSpec extends Specification {
     }
     def stackAfter(insn: AbstractInsnNode) = {
       val c = exec(insn)
-      c.locals must_== Map()
+      c.locals must_== Map.empty
       c.stack
     }
     "ACONST_NULL" in {

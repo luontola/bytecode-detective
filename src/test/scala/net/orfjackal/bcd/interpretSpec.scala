@@ -16,7 +16,7 @@ object interpretSpec extends Specification {
     }
     "the locals are empty" in {
       var c = new MethodContext()
-      c.locals must_== Map()
+      c.locals must_== Map.empty
     }
   }
 

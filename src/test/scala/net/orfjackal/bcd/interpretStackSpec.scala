@@ -16,7 +16,7 @@ object interpretStackSpec extends Specification {
         KnownValue(2, classOf[Int]),
         KnownValue(3, classOf[Int]),
         KnownValue(4, classOf[Int]))
-      val c = new MethodContext(stack, Map())
+      val c = new MethodContext(stack, Map.empty)
       c.execute(insn)
     }
     "POP" in {

@@ -15,6 +15,42 @@ class MethodContext(
 
   def this() = this (Nil, Map.empty, Set.empty)
 
+  def execute(insn: AbstractInsnNode): MethodContext = updateValues(insn).updateNextInstructions(insn)
+
+  private def updateValues(insn: AbstractInsnNode): MethodContext = {
+    insn.getType match {
+      case AbstractInsnNode.INSN => updateValues(insn.asInstanceOf[InsnNode])
+      case AbstractInsnNode.INT_INSN => updateValues(insn.asInstanceOf[IntInsnNode])
+      case AbstractInsnNode.VAR_INSN => updateValues(insn.asInstanceOf[VarInsnNode])
+      case AbstractInsnNode.TYPE_INSN => updateValues(insn.asInstanceOf[TypeInsnNode])
+      case AbstractInsnNode.FIELD_INSN => updateValues(insn.asInstanceOf[FieldInsnNode])
+      case AbstractInsnNode.METHOD_INSN => updateValues(insn.asInstanceOf[MethodInsnNode])
+      case AbstractInsnNode.JUMP_INSN => updateValues(insn.asInstanceOf[JumpInsnNode])
+      case AbstractInsnNode.LABEL => updateValues(insn.asInstanceOf[LabelNode])
+      case AbstractInsnNode.LDC_INSN => updateValues(insn.asInstanceOf[LdcInsnNode])
+      case AbstractInsnNode.IINC_INSN => updateValues(insn.asInstanceOf[IincInsnNode])
+      case AbstractInsnNode.TABLESWITCH_INSN => updateValues(insn.asInstanceOf[TableSwitchInsnNode])
+      case AbstractInsnNode.LOOKUPSWITCH_INSN => updateValues(insn.asInstanceOf[LookupSwitchInsnNode])
+      case AbstractInsnNode.MULTIANEWARRAY_INSN => updateValues(insn.asInstanceOf[MultiANewArrayInsnNode])
+      case AbstractInsnNode.FRAME => updateValues(insn.asInstanceOf[FrameNode])
+      case AbstractInsnNode.LINE => updateValues(insn.asInstanceOf[LineNumberNode])
+    }
+  }
+
+  private def updateNextInstructions(insn: AbstractInsnNode): MethodContext = {
+    insn.getType match {
+      case AbstractInsnNode.INSN => updateNextInstructions(insn.asInstanceOf[InsnNode])
+      case AbstractInsnNode.JUMP_INSN => updateNextInstructions(insn.asInstanceOf[JumpInsnNode])
+      case AbstractInsnNode.TABLESWITCH_INSN => updateNextInstructions(insn.asInstanceOf[TableSwitchInsnNode])
+      case AbstractInsnNode.LOOKUPSWITCH_INSN => updateNextInstructions(insn.asInstanceOf[LookupSwitchInsnNode])
+      case _ => defaultNextInstruction(insn)
+    }
+  }
+
+  private def defaultNextInstruction(insn: AbstractInsnNode) = {
+    this withNext insn.getNext
+  }
+
   private def withNext(next: AbstractInsnNode) = {
     if (next == null)
       this
@@ -28,29 +64,8 @@ class MethodContext(
   }
 
 
-  def execute(insn: AbstractInsnNode): MethodContext = {
-    insn.getType match {
-      case AbstractInsnNode.INSN => execute(insn.asInstanceOf[InsnNode])
-      case AbstractInsnNode.INT_INSN => execute(insn.asInstanceOf[IntInsnNode])
-      case AbstractInsnNode.VAR_INSN => execute(insn.asInstanceOf[VarInsnNode])
-      case AbstractInsnNode.TYPE_INSN => execute(insn.asInstanceOf[TypeInsnNode])
-      case AbstractInsnNode.FIELD_INSN => execute(insn.asInstanceOf[FieldInsnNode])
-      case AbstractInsnNode.METHOD_INSN => execute(insn.asInstanceOf[MethodInsnNode])
-      case AbstractInsnNode.JUMP_INSN => execute(insn.asInstanceOf[JumpInsnNode])
-      case AbstractInsnNode.LABEL => execute(insn.asInstanceOf[LabelNode])
-      case AbstractInsnNode.LDC_INSN => execute(insn.asInstanceOf[LdcInsnNode])
-      case AbstractInsnNode.IINC_INSN => execute(insn.asInstanceOf[IincInsnNode])
-      case AbstractInsnNode.TABLESWITCH_INSN => execute(insn.asInstanceOf[TableSwitchInsnNode])
-      case AbstractInsnNode.LOOKUPSWITCH_INSN => execute(insn.asInstanceOf[LookupSwitchInsnNode])
-      case AbstractInsnNode.MULTIANEWARRAY_INSN => execute(insn.asInstanceOf[MultiANewArrayInsnNode])
-      case AbstractInsnNode.FRAME => execute(insn.asInstanceOf[FrameNode])
-      case AbstractInsnNode.LINE => execute(insn.asInstanceOf[LineNumberNode])
-    }
-  }
-
-
-  private def execute(insn: InsnNode) = {
-    val result = insn.getOpcode match {
+  private def updateValues(insn: InsnNode) = {
+    insn.getOpcode match {
     // TODO
       case Opcodes.NOP => this
       // Constants
@@ -169,7 +184,9 @@ class MethodContext(
       case Opcodes.MONITORENTER => this
       case Opcodes.MONITOREXIT => this
     }
+  }
 
+  private def updateNextInstructions(insn: InsnNode) = {
     val endOfMethod = insn.getOpcode match {
       case Opcodes.IRETURN => true
       case Opcodes.LRETURN => true
@@ -181,9 +198,9 @@ class MethodContext(
       case _ => false
     }
     if (endOfMethod) {
-      result
+      this withNext Nil
     } else {
-      result withNext (insn.getNext)
+      defaultNextInstruction(insn)
     }
   }
 
@@ -211,20 +228,20 @@ class MethodContext(
   private def swap() = new MethodContext(stack.tail.head :: stack.head :: stack.drop(2), locals)
 
 
-  private def execute(insn: IntInsnNode) = {
-    (insn.getOpcode match {
+  private def updateValues(insn: IntInsnNode) = {
+    insn.getOpcode match {
     // Constants
       case Opcodes.BIPUSH => const(insn.operand.asInstanceOf[Byte], classOf[Byte])
       case Opcodes.SIPUSH => const(insn.operand.asInstanceOf[Short], classOf[Short])
       // TODO
       case Opcodes.NEWARRAY => this
-    }) withNext (insn.getNext)
+    }
   }
 
 
-  private def execute(insn: VarInsnNode) = {
+  private def updateValues(insn: VarInsnNode) = {
     val idx = insn.`var`
-    (insn.getOpcode match {
+    insn.getOpcode match {
     // Local variables
       case Opcodes.ILOAD => load(idx, classOf[Int])
       case Opcodes.LLOAD => load2(idx, classOf[Long])
@@ -238,7 +255,7 @@ class MethodContext(
       case Opcodes.ASTORE => store(idx, classOf[Object])
       // Subroutines
       case Opcodes.RET => throw new IllegalArgumentException("V1_5 bytecode is not supported")
-    }) withNext (insn.getNext)
+    }
   }
 
   private def load(idx: Int, typ: Class[_]) = {
@@ -270,42 +287,42 @@ class MethodContext(
   private def store2(idx: Int, typ: Class[_]) = store(idx, typ).store(idx + 1, typ)
 
 
-  private def execute(insn: TypeInsnNode) = {
-    (insn.getOpcode match {
+  private def updateValues(insn: TypeInsnNode) = {
+    insn.getOpcode match {
     // TODO
       case Opcodes.NEW => this
       case Opcodes.ANEWARRAY => this
       // TODO
       case Opcodes.CHECKCAST => this
       case Opcodes.INSTANCEOF => this
-    }) withNext (insn.getNext)
+    }
   }
 
 
-  private def execute(insn: FieldInsnNode) = {
-    (insn.getOpcode match {
+  private def updateValues(insn: FieldInsnNode) = {
+    insn.getOpcode match {
     // TODO
       case Opcodes.GETSTATIC => this
       case Opcodes.PUTSTATIC => this
       case Opcodes.GETFIELD => this
       case Opcodes.PUTFIELD => this
-    }) withNext (insn.getNext)
+    }
   }
 
 
-  private def execute(insn: MethodInsnNode) = {
-    (insn.getOpcode match {
+  private def updateValues(insn: MethodInsnNode) = {
+    insn.getOpcode match {
     // TODO
       case Opcodes.INVOKEVIRTUAL => this
       case Opcodes.INVOKESPECIAL => this
       case Opcodes.INVOKESTATIC => this
       case Opcodes.INVOKEINTERFACE => this
-    }) withNext (insn.getNext)
+    }
   }
 
 
-  private def execute(insn: JumpInsnNode) = {
-    val result = insn.getOpcode match {
+  private def updateValues(insn: JumpInsnNode) = {
+    insn.getOpcode match {
     // Jumps
       case Opcodes.IFEQ => pop()
       case Opcodes.IFNE => pop()
@@ -328,24 +345,26 @@ class MethodContext(
       case Opcodes.IFNULL => pop()
       case Opcodes.IFNONNULL => pop()
     }
+  }
 
+  private def updateNextInstructions(insn: JumpInsnNode) = {
     if (insn.getOpcode == Opcodes.GOTO) {
-      result withNext (insn.label)
+      this withNext insn.label
     } else {
-      result withNext List(insn.getNext, insn.label)
+      this withNext List(insn.getNext, insn.label)
     }
   }
 
 
-  private def execute(insn: LabelNode) = {
+  private def updateValues(insn: LabelNode) = {
     // TODO
-    this withNext (insn.getNext)
+    this
   }
 
 
-  private def execute(insn: LdcInsnNode) = {
+  private def updateValues(insn: LdcInsnNode) = {
     assert(insn.getOpcode == Opcodes.LDC)
-    (insn.cst match {
+    insn.cst match {
     // Constants (constant pool)
       case cst: java.lang.Integer => const(cst.intValue, classOf[Int])
       case cst: java.lang.Float => const(cst.floatValue, classOf[Float])
@@ -353,40 +372,46 @@ class MethodContext(
       case cst: java.lang.Double => const2(cst.doubleValue, classOf[Double])
       case cst: java.lang.String => aconst(cst, classOf[java.lang.String])
       case cst: org.objectweb.asm.Type => aconst(cst, classOf[org.objectweb.asm.Type])
-    }) withNext (insn.getNext)
+    }
   }
 
 
-  private def execute(insn: IincInsnNode) = {
+  private def updateValues(insn: IincInsnNode) = {
     assert(insn.getOpcode == Opcodes.IINC)
     // TODO
-    this withNext (insn.getNext)
+    this
   }
 
 
-  private def execute(insn: TableSwitchInsnNode) = {
+  private def updateValues(insn: TableSwitchInsnNode) = {
     assert(insn.getOpcode == Opcodes.TABLESWITCH)
-    val labels = List(insn.dflt) ++ insn.labels.toArray(Array[LabelNode]())
-    pop() withNext labels
+    pop()
+  }
+
+  private def updateNextInstructions(insn: TableSwitchInsnNode) = {
+    this withNext (List(insn.dflt) ++ insn.labels.toArray(Array[LabelNode]()))
   }
 
 
-  private def execute(insn: LookupSwitchInsnNode) = {
+  private def updateValues(insn: LookupSwitchInsnNode) = {
     assert(insn.getOpcode == Opcodes.LOOKUPSWITCH)
-    val labels = List(insn.dflt) ++ insn.labels.toArray(Array[LabelNode]())
-    pop() withNext labels
+    pop()
+  }
+
+  private def updateNextInstructions(insn: LookupSwitchInsnNode) = {
+    this withNext (List(insn.dflt) ++ insn.labels.toArray(Array[LabelNode]()))
   }
 
 
-  private def execute(insn: MultiANewArrayInsnNode) = {
+  private def updateValues(insn: MultiANewArrayInsnNode) = {
     assert(insn.getOpcode == Opcodes.MULTIANEWARRAY)
     // TODO
-    this withNext (insn.getNext)
+    this
   }
 
 
-  private def execute(insn: FrameNode) = {
-    (insn.`type` match {
+  private def updateValues(insn: FrameNode) = {
+    insn.`type` match {
     // TODO
       case Opcodes.F_NEW => this
       case Opcodes.F_FULL => this
@@ -394,12 +419,12 @@ class MethodContext(
       case Opcodes.F_CHOP => this
       case Opcodes.F_SAME => this
       case Opcodes.F_SAME1 => this
-    }) withNext (insn.getNext)
+    }
   }
 
 
-  private def execute(insn: LineNumberNode) = {
+  private def updateValues(insn: LineNumberNode) = {
     // TODO
-    this withNext (insn.getNext)
+    this
   }
 }
