@@ -8,9 +8,25 @@ import org.objectweb.asm.tree._
 
 class MethodContext(
         val stack: List[Value],
-        val locals: Map[Int, Value]
+        val locals: Map[Int, Value],
+        val nextInstructions: Set[AbstractInsnNode]
         ) {
-  def this() = this (Nil, Map())
+  def this(stack: List[Value], locals: Map[Int, Value]) = this (stack, locals, Set.empty)
+
+  def this() = this (Nil, Map.empty, Set.empty)
+
+  private def withNext(next: AbstractInsnNode) = {
+    if (next == null)
+      this
+    else
+      new MethodContext(stack, locals, Set(next))
+  }
+
+  private def withNext(next: List[AbstractInsnNode]) = {
+    val nextNonNull = Set.empty ++ next.filter((n) => n != null)
+    new MethodContext(stack, locals, nextNonNull)
+  }
+
 
   def execute(insn: AbstractInsnNode): MethodContext = {
     insn.getType match {
@@ -34,7 +50,7 @@ class MethodContext(
 
 
   private def execute(insn: InsnNode) = {
-    insn.getOpcode match {
+    val result = insn.getOpcode match {
     // TODO
       case Opcodes.NOP => this
       // Constants
@@ -73,7 +89,7 @@ class MethodContext(
       case Opcodes.SASTORE => this
       // Stack
       case Opcodes.POP => pop()
-      case Opcodes.POP2 => pop().pop()
+      case Opcodes.POP2 => pop2()
       case Opcodes.DUP => dup()
       case Opcodes.DUP_X1 => dup_x(1)
       case Opcodes.DUP_X2 => dup_x(2)
@@ -153,6 +169,22 @@ class MethodContext(
       case Opcodes.MONITORENTER => this
       case Opcodes.MONITOREXIT => this
     }
+
+    val endOfMethod = insn.getOpcode match {
+      case Opcodes.IRETURN => true
+      case Opcodes.LRETURN => true
+      case Opcodes.FRETURN => true
+      case Opcodes.DRETURN => true
+      case Opcodes.ARETURN => true
+      case Opcodes.RETURN => true
+      case Opcodes.ATHROW => true
+      case _ => false
+    }
+    if (endOfMethod) {
+      result
+    } else {
+      result withNext (insn.getNext)
+    }
   }
 
   private def aconst[T <: AnyRef](value: T, typ: Class[T]) = push(new KnownRef(value, typ))
@@ -166,6 +198,8 @@ class MethodContext(
 
   private def pop() = new MethodContext(stack.tail, locals)
 
+  private def pop2() = new MethodContext(stack.drop(2), locals)
+
   private def dup() = new MethodContext(stack.head :: stack, locals)
 
   private def dup_x(n: Int) = new MethodContext(stack.take(n + 1) ::: stack.head :: stack.drop(n + 1), locals)
@@ -178,19 +212,19 @@ class MethodContext(
 
 
   private def execute(insn: IntInsnNode) = {
-    insn.getOpcode match {
+    (insn.getOpcode match {
     // Constants
       case Opcodes.BIPUSH => const(insn.operand.asInstanceOf[Byte], classOf[Byte])
       case Opcodes.SIPUSH => const(insn.operand.asInstanceOf[Short], classOf[Short])
       // TODO
       case Opcodes.NEWARRAY => this
-    }
+    }) withNext (insn.getNext)
   }
 
 
   private def execute(insn: VarInsnNode) = {
     val idx = insn.`var`
-    insn.getOpcode match {
+    (insn.getOpcode match {
     // Local variables
       case Opcodes.ILOAD => load(idx, classOf[Int])
       case Opcodes.LLOAD => load2(idx, classOf[Long])
@@ -204,7 +238,7 @@ class MethodContext(
       case Opcodes.ASTORE => store(idx, classOf[Object])
       // Subroutines
       case Opcodes.RET => throw new IllegalArgumentException("V1_5 bytecode is not supported")
-    }
+    }) withNext (insn.getNext)
   }
 
   private def load(idx: Int, typ: Class[_]) = {
@@ -237,75 +271,81 @@ class MethodContext(
 
 
   private def execute(insn: TypeInsnNode) = {
-    insn.getOpcode match {
+    (insn.getOpcode match {
     // TODO
       case Opcodes.NEW => this
       case Opcodes.ANEWARRAY => this
       // TODO
       case Opcodes.CHECKCAST => this
       case Opcodes.INSTANCEOF => this
-    }
+    }) withNext (insn.getNext)
   }
 
 
   private def execute(insn: FieldInsnNode) = {
-    insn.getOpcode match {
+    (insn.getOpcode match {
     // TODO
       case Opcodes.GETSTATIC => this
       case Opcodes.PUTSTATIC => this
       case Opcodes.GETFIELD => this
       case Opcodes.PUTFIELD => this
-    }
+    }) withNext (insn.getNext)
   }
 
 
   private def execute(insn: MethodInsnNode) = {
-    insn.getOpcode match {
+    (insn.getOpcode match {
     // TODO
       case Opcodes.INVOKEVIRTUAL => this
       case Opcodes.INVOKESPECIAL => this
       case Opcodes.INVOKESTATIC => this
       case Opcodes.INVOKEINTERFACE => this
-    }
+    }) withNext (insn.getNext)
   }
 
 
   private def execute(insn: JumpInsnNode) = {
-    insn.getOpcode match {
-    // TODO
-      case Opcodes.IFEQ => this
-      case Opcodes.IFNE => this
-      case Opcodes.IFLT => this
-      case Opcodes.IFGE => this
-      case Opcodes.IFGT => this
-      case Opcodes.IFLE => this
-      case Opcodes.IF_ICMPEQ => this
-      case Opcodes.IF_ICMPNE => this
-      case Opcodes.IF_ICMPLT => this
-      case Opcodes.IF_ICMPGE => this
-      case Opcodes.IF_ICMPGT => this
-      case Opcodes.IF_ICMPLE => this
-      case Opcodes.IF_ACMPEQ => this
-      case Opcodes.IF_ACMPNE => this
+    val result = insn.getOpcode match {
+    // Jumps
+      case Opcodes.IFEQ => pop()
+      case Opcodes.IFNE => pop()
+      case Opcodes.IFLT => pop()
+      case Opcodes.IFGE => pop()
+      case Opcodes.IFGT => pop()
+      case Opcodes.IFLE => pop()
+      case Opcodes.IF_ICMPEQ => pop2()
+      case Opcodes.IF_ICMPNE => pop2()
+      case Opcodes.IF_ICMPLT => pop2()
+      case Opcodes.IF_ICMPGE => pop2()
+      case Opcodes.IF_ICMPGT => pop2()
+      case Opcodes.IF_ICMPLE => pop2()
+      case Opcodes.IF_ACMPEQ => pop2()
+      case Opcodes.IF_ACMPNE => pop2()
       case Opcodes.GOTO => this
       // Subroutines
       case Opcodes.JSR => throw new IllegalArgumentException("V1_5 bytecode is not supported")
-      // TODO
-      case Opcodes.IFNULL => this
-      case Opcodes.IFNONNULL => this
+      // Jumps
+      case Opcodes.IFNULL => pop()
+      case Opcodes.IFNONNULL => pop()
+    }
+
+    if (insn.getOpcode == Opcodes.GOTO) {
+      result withNext (insn.label)
+    } else {
+      result withNext List(insn.getNext, insn.label)
     }
   }
 
 
   private def execute(insn: LabelNode) = {
     // TODO
-    this
+    this withNext (insn.getNext)
   }
 
 
   private def execute(insn: LdcInsnNode) = {
     assert(insn.getOpcode == Opcodes.LDC)
-    insn.cst match {
+    (insn.cst match {
     // Constants (constant pool)
       case cst: java.lang.Integer => const(cst.intValue, classOf[Int])
       case cst: java.lang.Float => const(cst.floatValue, classOf[Float])
@@ -313,40 +353,40 @@ class MethodContext(
       case cst: java.lang.Double => const2(cst.doubleValue, classOf[Double])
       case cst: java.lang.String => aconst(cst, classOf[java.lang.String])
       case cst: org.objectweb.asm.Type => aconst(cst, classOf[org.objectweb.asm.Type])
-    }
+    }) withNext (insn.getNext)
   }
 
 
   private def execute(insn: IincInsnNode) = {
     assert(insn.getOpcode == Opcodes.IINC)
     // TODO
-    this
+    this withNext (insn.getNext)
   }
 
 
   private def execute(insn: TableSwitchInsnNode) = {
     assert(insn.getOpcode == Opcodes.TABLESWITCH)
-    // TODO
-    this
+    val labels = List(insn.dflt) ++ insn.labels.toArray(Array[LabelNode]())
+    pop() withNext labels
   }
 
 
   private def execute(insn: LookupSwitchInsnNode) = {
     assert(insn.getOpcode == Opcodes.LOOKUPSWITCH)
-    // TODO
-    this
+    val labels = List(insn.dflt) ++ insn.labels.toArray(Array[LabelNode]())
+    pop() withNext labels
   }
 
 
   private def execute(insn: MultiANewArrayInsnNode) = {
     assert(insn.getOpcode == Opcodes.MULTIANEWARRAY)
     // TODO
-    this
+    this withNext (insn.getNext)
   }
 
 
   private def execute(insn: FrameNode) = {
-    insn.`type` match {
+    (insn.`type` match {
     // TODO
       case Opcodes.F_NEW => this
       case Opcodes.F_FULL => this
@@ -354,12 +394,12 @@ class MethodContext(
       case Opcodes.F_CHOP => this
       case Opcodes.F_SAME => this
       case Opcodes.F_SAME1 => this
-    }
+    }) withNext (insn.getNext)
   }
 
 
   private def execute(insn: LineNumberNode) = {
     // TODO
-    this
+    this withNext (insn.getNext)
   }
 }
