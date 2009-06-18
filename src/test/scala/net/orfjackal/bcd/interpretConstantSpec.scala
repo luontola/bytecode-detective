@@ -91,7 +91,8 @@ object interpretConstantSpec extends Specification {
       stackAfter(new LdcInsnNode(v)) must_== List(KnownRef(v, classOf[String]))
     }
     "LDC Type" in {
-      val v = Type.getType("Lexample/Example;")
+      // TODO: should we use java.lang.Class instead of org.objectweb.asm.Type ?
+      val v = Type.getType("Ljava/lang/String;")
       stackAfter(new LdcInsnNode(v)) must_== List(KnownRef(v, classOf[Type]))
     }
   }

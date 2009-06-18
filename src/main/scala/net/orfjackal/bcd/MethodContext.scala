@@ -149,22 +149,22 @@ class MethodContext(
       case Opcodes.LOR => lcalc()
       case Opcodes.IXOR => icalc()
       case Opcodes.LXOR => lcalc()
-      // TODO
-      case Opcodes.I2L => this
-      case Opcodes.I2F => this
-      case Opcodes.I2D => this
-      case Opcodes.L2I => this
-      case Opcodes.L2F => this
-      case Opcodes.L2D => this
-      case Opcodes.F2I => this
-      case Opcodes.F2L => this
-      case Opcodes.F2D => this
-      case Opcodes.D2I => this
-      case Opcodes.D2L => this
-      case Opcodes.D2F => this
-      case Opcodes.I2B => this
-      case Opcodes.I2C => this
-      case Opcodes.I2S => this
+      // Casts
+      case Opcodes.I2L => pop().push2(KnownType(classOf[Long]))
+      case Opcodes.I2F => pop().push(KnownType(classOf[Float]))
+      case Opcodes.I2D => pop().push2(KnownType(classOf[Double]))
+      case Opcodes.L2I => pop2().push(KnownType(classOf[Int]))
+      case Opcodes.L2F => pop2().push(KnownType(classOf[Float]))
+      case Opcodes.L2D => pop2().push2(KnownType(classOf[Double]))
+      case Opcodes.F2I => pop().push(KnownType(classOf[Int]))
+      case Opcodes.F2L => pop().push2(KnownType(classOf[Long]))
+      case Opcodes.F2D => pop().push2(KnownType(classOf[Double]))
+      case Opcodes.D2I => pop2().push(KnownType(classOf[Int]))
+      case Opcodes.D2L => pop2().push2(KnownType(classOf[Long]))
+      case Opcodes.D2F => pop2().push(KnownType(classOf[Float]))
+      case Opcodes.I2B => pop().push(KnownType(classOf[Byte]))
+      case Opcodes.I2C => pop().push(KnownType(classOf[Char]))
+      case Opcodes.I2S => pop().push(KnownType(classOf[Short]))
       // Logic
       case Opcodes.LCMP => lcmp()
       case Opcodes.FCMPL => fcmp()
@@ -239,8 +239,9 @@ class MethodContext(
     // TODO
       case Opcodes.NEW => this
       case Opcodes.ANEWARRAY => this
+      // Casts
+      case Opcodes.CHECKCAST => checkcast(insn.desc)
       // TODO
-      case Opcodes.CHECKCAST => this
       case Opcodes.INSTANCEOF => this
     }
   }
@@ -450,4 +451,13 @@ class MethodContext(
 
   private def dcmp() = pop2().pop2().push(KnownType(classOf[Int]))
 
+  // Casts
+
+  private def checkcast(desc: String) = {
+    val typ = Class.forName(desc.replace('/', '.'))
+    stack.head match {
+      case UnknownValue() => pop().push(KnownType(typ))
+      case _ => this
+    }
+  }
 }
