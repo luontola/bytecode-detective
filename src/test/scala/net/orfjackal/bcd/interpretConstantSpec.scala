@@ -90,10 +90,13 @@ object interpretConstantSpec extends Specification {
       val v = "str"
       stackAfter(new LdcInsnNode(v)) must_== List(KnownRef(v, classOf[String]))
     }
+    // TODO: in which situations is "LDC Type" used? ASM Guide refers to it, but not http://www.brics.dk/~mis/dOvs/jvmspec/ref-_ldc.html
+    /*
     "LDC Type" in {
       // TODO: should we use java.lang.Class instead of org.objectweb.asm.Type ?
       val v = Type.getType("Ljava/lang/String;")
       stackAfter(new LdcInsnNode(v)) must_== List(KnownRef(v, classOf[Type]))
     }
+    */
   }
 }

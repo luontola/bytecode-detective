@@ -3,7 +3,7 @@
 
 package net.orfjackal.bcd
 
-import org.objectweb.asm.Opcodes
+import org.objectweb.asm._
 import org.objectweb.asm.tree._
 
 class MethodContext(
@@ -17,6 +17,7 @@ class MethodContext(
 
   def execute(insn: AbstractInsnNode): MethodContext = updateValues(insn).updateNextInstructions(insn)
 
+  // TODO: handle TryCatchBlockNode? unless it is handled, the code of catch blocks will not be visited.
   private def updateValues(insn: AbstractInsnNode): MethodContext = {
     insn.getType match {
       case AbstractInsnNode.INSN => updateValues(insn.asInstanceOf[InsnNode])
@@ -181,9 +182,9 @@ class MethodContext(
       // TODO
       case Opcodes.ARRAYLENGTH => this
       case Opcodes.ATHROW => this
-      // TODO
-      case Opcodes.MONITORENTER => this
-      case Opcodes.MONITOREXIT => this
+      // Objects
+      case Opcodes.MONITORENTER => pop()
+      case Opcodes.MONITOREXIT => pop()
     }
   }
 
@@ -235,34 +236,58 @@ class MethodContext(
   }
 
   private def updateValues(insn: TypeInsnNode) = {
+    val typ = desc2class(insn.desc)
     insn.getOpcode match {
-    // TODO
-      case Opcodes.NEW => this
+    // Objects
+      case Opcodes.NEW => push(KnownType(typ))
+      // TODO
       case Opcodes.ANEWARRAY => this
       // Casts
-      case Opcodes.CHECKCAST => checkcast(insn.desc)
-      // TODO
-      case Opcodes.INSTANCEOF => this
+      case Opcodes.CHECKCAST => checkcast(typ)
+      // Objects
+      case Opcodes.INSTANCEOF => pop().push(KnownType(classOf[Boolean]))
     }
   }
 
   private def updateValues(insn: FieldInsnNode) = {
+    val fieldType = Type.getType(insn.desc)
     insn.getOpcode match {
-    // TODO
-      case Opcodes.GETSTATIC => this
-      case Opcodes.PUTSTATIC => this
-      case Opcodes.GETFIELD => this
-      case Opcodes.PUTFIELD => this
+    // Fields
+      case Opcodes.GETSTATIC =>
+        if (isWide(fieldType))
+          push2(KnownType(fieldType))
+        else
+          push(KnownType(fieldType))
+
+      case Opcodes.PUTSTATIC =>
+        if (isWide(fieldType))
+          pop2()
+        else
+          pop()
+
+      case Opcodes.GETFIELD =>
+        if (isWide(fieldType))
+          pop().push2(KnownType(fieldType))
+        else
+          pop().push(KnownType(fieldType))
+
+      case Opcodes.PUTFIELD =>
+        if (isWide(fieldType))
+          pop2().pop()
+        else
+          pop().pop()
     }
   }
 
   private def updateValues(insn: MethodInsnNode) = {
+    val args = Type.getArgumentTypes(insn.desc)
+    val ret = Type.getReturnType(insn.desc)
     insn.getOpcode match {
-    // TODO
-      case Opcodes.INVOKEVIRTUAL => this
-      case Opcodes.INVOKESPECIAL => this
-      case Opcodes.INVOKESTATIC => this
-      case Opcodes.INVOKEINTERFACE => this
+    // Methods
+      case Opcodes.INVOKEVIRTUAL => invoke_virtual(args, ret)
+      case Opcodes.INVOKESPECIAL => invoke_virtual(args, ret)
+      case Opcodes.INVOKESTATIC => invoke_static(args, ret)
+      case Opcodes.INVOKEINTERFACE => invoke_virtual(args, ret)
     }
   }
 
@@ -314,7 +339,8 @@ class MethodContext(
       case cst: java.lang.Long => const2(cst.longValue, classOf[Long])
       case cst: java.lang.Double => const2(cst.doubleValue, classOf[Double])
       case cst: java.lang.String => aconst(cst, classOf[java.lang.String])
-      case cst: org.objectweb.asm.Type => aconst(cst, classOf[org.objectweb.asm.Type])
+    // TODO: replace Type with something else?
+    //case cst: org.objectweb.asm.Type => aconst(cst, classOf[org.objectweb.asm.Type]) 
     }
   }
 
@@ -453,11 +479,60 @@ class MethodContext(
 
   // Casts
 
-  private def checkcast(desc: String) = {
-    val typ = Class.forName(desc.replace('/', '.'))
+  private def checkcast(cls: Class[_]) = {
     stack.head match {
-      case UnknownValue() => pop().push(KnownType(typ))
+      case UnknownValue() => pop().push(KnownType(cls))
       case _ => this
     }
   }
+
+  // Methods
+
+  private def invoke_virtual(args: Array[Type], ret: Type) = invoke(args, ret, false)
+
+  private def invoke_static(args: Array[Type], ret: Type) = invoke(args, ret, true)
+
+  private def invoke(argumentTypes: Array[Type], returnType: Type, static: Boolean) = {
+    var c = this
+    // objectref
+    if (!static)
+      c = c.pop()
+    // argN, ..., arg2, arg1
+    for (argType <- argumentTypes) {
+      if (isWide(argType))
+        c = c.pop2()
+      else
+        c = c.pop()
+    }
+    // result
+    if (returnType == Type.VOID_TYPE)
+      c
+    else if (isWide(returnType))
+      c.push2(KnownType(returnType))
+    else
+      c.push(KnownType(returnType))
+  }
+
+  // ASM Utils
+
+  private implicit def type2class(typ: Type): Class[_] = {
+    typ.getSort match {
+      case Type.VOID => classOf[Void]
+      case Type.BOOLEAN => classOf[Boolean]
+      case Type.CHAR => classOf[Char]
+      case Type.BYTE => classOf[Byte]
+      case Type.SHORT => classOf[Short]
+      case Type.INT => classOf[Int]
+      case Type.FLOAT => classOf[Float]
+      case Type.LONG => classOf[Long]
+      case Type.DOUBLE => classOf[Double]
+      case Type.ARRAY => desc2class(typ.getInternalName)
+      case Type.OBJECT => desc2class(typ.getInternalName)
+    }
+  }
+
+  private def desc2class(desc: String) = Class.forName(desc.replace('/', '.'))
+
+  private def isWide(typ: Type): Boolean = (typ.getSort == Type.LONG || typ.getSort == Type.DOUBLE)
+
 }
