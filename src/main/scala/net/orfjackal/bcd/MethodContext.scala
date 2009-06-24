@@ -85,24 +85,23 @@ class MethodContext(
       case Opcodes.FCONST_2 => const(2.0F, classOf[Float])
       case Opcodes.DCONST_0 => const2(0.0, classOf[Double])
       case Opcodes.DCONST_1 => const2(1.0, classOf[Double])
-      // TODO
-      case Opcodes.IALOAD => this
-      case Opcodes.LALOAD => this
-      case Opcodes.FALOAD => this
-      case Opcodes.DALOAD => this
-      case Opcodes.AALOAD => this
-      case Opcodes.BALOAD => this
-      case Opcodes.CALOAD => this
-      case Opcodes.SALOAD => this
-      // TODO
-      case Opcodes.IASTORE => this
-      case Opcodes.LASTORE => this
-      case Opcodes.FASTORE => this
-      case Opcodes.DASTORE => this
-      case Opcodes.AASTORE => this
-      case Opcodes.BASTORE => this
-      case Opcodes.CASTORE => this
-      case Opcodes.SASTORE => this
+      // Arrays
+      case Opcodes.IALOAD => aload(classOf[Int])
+      case Opcodes.LALOAD => aload2(classOf[Long])
+      case Opcodes.FALOAD => aload(classOf[Float])
+      case Opcodes.DALOAD => aload2(classOf[Double])
+      case Opcodes.AALOAD => aaload()
+      case Opcodes.BALOAD => aload(classOf[Byte])
+      case Opcodes.CALOAD => aload(classOf[Char])
+      case Opcodes.SALOAD => aload(classOf[Short])
+      case Opcodes.IASTORE => astore()
+      case Opcodes.LASTORE => astore2()
+      case Opcodes.FASTORE => astore()
+      case Opcodes.DASTORE => astore2()
+      case Opcodes.AASTORE => astore()
+      case Opcodes.BASTORE => astore()
+      case Opcodes.CASTORE => astore()
+      case Opcodes.SASTORE => astore()
       // Stack
       case Opcodes.POP => pop()
       case Opcodes.POP2 => pop2()
@@ -179,8 +178,9 @@ class MethodContext(
       case Opcodes.DRETURN => this
       case Opcodes.ARETURN => this
       case Opcodes.RETURN => this
+      // Arrays
+      case Opcodes.ARRAYLENGTH => pop().push(KnownType(classOf[Int]))
       // TODO
-      case Opcodes.ARRAYLENGTH => this
       case Opcodes.ATHROW => this
       // Objects
       case Opcodes.MONITORENTER => pop()
@@ -211,8 +211,8 @@ class MethodContext(
     // Constants
       case Opcodes.BIPUSH => const(insn.operand.asInstanceOf[Byte], classOf[Byte])
       case Opcodes.SIPUSH => const(insn.operand.asInstanceOf[Short], classOf[Short])
-      // TODO
-      case Opcodes.NEWARRAY => this
+      // Arrays
+      case Opcodes.NEWARRAY => newarray(typecode2class(insn.operand))
     }
   }
 
@@ -240,8 +240,8 @@ class MethodContext(
     insn.getOpcode match {
     // Objects
       case Opcodes.NEW => push(KnownType(typ))
-      // TODO
-      case Opcodes.ANEWARRAY => this
+      // Arrays
+      case Opcodes.ANEWARRAY => anewarray(typ)
       // Casts
       case Opcodes.CHECKCAST => checkcast(typ)
       // Objects
@@ -369,8 +369,7 @@ class MethodContext(
 
   private def updateValues(insn: MultiANewArrayInsnNode) = {
     assert(insn.getOpcode == Opcodes.MULTIANEWARRAY)
-    // TODO
-    this
+    multianewarray(desc2class(insn.desc), insn.dims)
   }
 
   private def updateValues(insn: FrameNode) = {
@@ -512,6 +511,42 @@ class MethodContext(
       c.push(KnownType(returnType))
   }
 
+  // Arrays
+
+  private def newarray(componentType: Class[_]) = {
+    val array = java.lang.reflect.Array.newInstance(componentType, 0)
+    pop().push(KnownType(array.getClass))
+  }
+
+  private def anewarray(componentType: Class[_]) = {
+    val array = java.lang.reflect.Array.newInstance(componentType, 0)
+    pop().push(KnownType(array.getClass))
+  }
+
+  private def multianewarray(componentType: Class[_], dimensions: Int) = {
+    val array = java.lang.reflect.Array.newInstance(componentType, new Array[Int](dimensions))
+    var c = this
+    for (i <- 0 until dimensions)
+      c = c.pop()
+    c.push(KnownType(array.getClass))
+  }
+
+  private def aload(typ: Class[_]) = pop().pop().push(KnownType(typ))
+
+  private def aload2(typ: Class[_]) = pop().pop().push2(KnownType(typ))
+
+  private def aaload() = {
+    val arrayRef = stack.tail.head
+    arrayRef match {
+      case KnownType(arrayType) => aload(arrayType.getComponentType)
+      case _ => aload(classOf[Object])
+    }
+  }
+
+  private def astore() = pop().pop().pop()
+
+  private def astore2() = pop2().pop().pop()
+
   // ASM Utils
 
   private implicit def type2class(typ: Type): Class[_] = {
@@ -527,6 +562,19 @@ class MethodContext(
       case Type.DOUBLE => classOf[Double]
       case Type.ARRAY => desc2class(typ.getInternalName)
       case Type.OBJECT => desc2class(typ.getInternalName)
+    }
+  }
+
+  private def typecode2class(typecode: Int): Class[_] = {
+    typecode match {
+      case Opcodes.T_BOOLEAN => classOf[Boolean]
+      case Opcodes.T_CHAR => classOf[Char]
+      case Opcodes.T_FLOAT => classOf[Float]
+      case Opcodes.T_DOUBLE => classOf[Double]
+      case Opcodes.T_BYTE => classOf[Byte]
+      case Opcodes.T_SHORT => classOf[Short]
+      case Opcodes.T_INT => classOf[Int]
+      case Opcodes.T_LONG => classOf[Long]
     }
   }
 
