@@ -171,17 +171,17 @@ class MethodContext(
       case Opcodes.FCMPG => fcmp()
       case Opcodes.DCMPL => dcmp()
       case Opcodes.DCMPG => dcmp()
-      // TODO
-      case Opcodes.IRETURN => this
-      case Opcodes.LRETURN => this
-      case Opcodes.FRETURN => this
-      case Opcodes.DRETURN => this
-      case Opcodes.ARETURN => this
+      // Return
+      case Opcodes.IRETURN => pop()
+      case Opcodes.LRETURN => pop2()
+      case Opcodes.FRETURN => pop()
+      case Opcodes.DRETURN => pop2()
+      case Opcodes.ARETURN => pop()
       case Opcodes.RETURN => this
       // Arrays
       case Opcodes.ARRAYLENGTH => pop().push(KnownType(classOf[Int]))
-      // TODO
-      case Opcodes.ATHROW => this
+      // Return
+      case Opcodes.ATHROW => pop()
       // Objects
       case Opcodes.MONITORENTER => pop()
       case Opcodes.MONITOREXIT => pop()
