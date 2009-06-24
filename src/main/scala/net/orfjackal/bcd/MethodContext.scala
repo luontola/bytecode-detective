@@ -538,8 +538,9 @@ class MethodContext(
 
   private def aaload() = {
     val arrayRef = stack.tail.head
-    arrayRef match { // TODO: match KnownRef
+    arrayRef match {
       case KnownType(arrayType) => aload(arrayType.getComponentType)
+      case KnownRef(array, arrayType) => aload(arrayType.getComponentType)
       case _ => aload(classOf[Object])
     }
   }

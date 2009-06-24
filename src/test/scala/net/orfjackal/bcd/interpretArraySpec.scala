@@ -110,6 +110,11 @@ object interpretArraySpec extends Specification {
       val c = exec(params, new InsnNode(Opcodes.AALOAD))
       c.stack must_== List(KnownType(classOf[String]))
     }
+    "AALOAD known array value" in {
+      val params = List(KnownType(classOf[Int]), KnownRef(Array[String]("x"), classOf[Array[String]]))
+      val c = exec(params, new InsnNode(Opcodes.AALOAD))
+      c.stack must_== List(KnownType(classOf[String]))
+    }
   }
 
   "Storing to arrays" should {

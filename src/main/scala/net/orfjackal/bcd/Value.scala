@@ -7,7 +7,7 @@ sealed abstract class Value {
   def getType: Option[Class[_]]
 }
 case class UnknownValue() extends Value {
-  def getType = None
+  def getType: Option[Class[_]] = None
 }
 case class KnownType(typ: Class[_]) extends Value {
   def getType = Some(typ)
