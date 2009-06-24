@@ -62,7 +62,7 @@ object interpretLocalVariableSpec extends Specification {
     // is not accidentally swapped.
     def exec(insn: AbstractInsnNode) = {
       val stack = List()
-      val locals = Map[Int, Value](
+      val locals = Map(
         0 -> KnownValue(10, classOf[Int]),
         1 -> KnownValue(11L, classOf[Long]),
         2 -> KnownValue(12L, classOf[Long]),
@@ -184,7 +184,7 @@ object interpretLocalVariableSpec extends Specification {
   "Increment integer in local variable" should {
     def exec(insn: AbstractInsnNode) = {
       val stack = List()
-      val locals = Map[Int, Value](
+      val locals = Map(
         0 -> KnownValue(10, classOf[Int]))
       val c = new MethodContext(stack, locals)
       c.execute(insn)
