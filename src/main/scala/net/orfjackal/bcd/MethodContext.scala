@@ -338,9 +338,8 @@ class MethodContext(
       case cst: java.lang.Float => const(cst.floatValue, classOf[Float])
       case cst: java.lang.Long => const2(cst.longValue, classOf[Long])
       case cst: java.lang.Double => const2(cst.doubleValue, classOf[Double])
-      case cst: java.lang.String => aconst(cst, classOf[java.lang.String])
-    // TODO: replace Type with something else?
-    //case cst: org.objectweb.asm.Type => aconst(cst, classOf[org.objectweb.asm.Type]) 
+      case cst: java.lang.String => aconst(cst, classOf[String])
+      case cst: org.objectweb.asm.Type => aconst(type2class(cst), classOf[Class[_]])
     }
   }
 
