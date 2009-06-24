@@ -180,4 +180,20 @@ object interpretLocalVariableSpec extends Specification {
         0 -> KnownRef("x", classOf[String]))
     }
   }
+
+  "Increment integer in local variable" should {
+    def exec(insn: AbstractInsnNode) = {
+      val stack = List()
+      val locals = Map[Int, Value](
+        0 -> KnownValue(10, classOf[Int]))
+      val c = new MethodContext(stack, locals)
+      c.execute(insn)
+    }
+    "IINC" in {
+      val c = exec(new IincInsnNode(0, 1))
+      c.stack must_== List()
+      c.locals must_== Map(
+        0 -> KnownType(classOf[Int]))
+    }
+  }
 }

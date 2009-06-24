@@ -345,8 +345,9 @@ class MethodContext(
 
   private def updateValues(insn: IincInsnNode) = {
     assert(insn.getOpcode == Opcodes.IINC)
-    // TODO
-    this
+    val idx = insn.`var`
+    val value = KnownType(classOf[Int])
+    new MethodContext(stack, locals.update(idx, value))
   }
 
   private def updateValues(insn: TableSwitchInsnNode) = {
@@ -398,7 +399,7 @@ class MethodContext(
       case Some(v: KnownRef[_]) => v
       case _ => KnownType(typ)
     }
-    assert(typ isAssignableFrom value.typ, "expected '" + typ + "' at " + idx + " but found " + value)
+    assert(typ isAssignableFrom value.getType.get, "expected '" + typ + "' at " + idx + " but found " + value)
     new MethodContext(value :: stack, locals.update(idx, value))
   }
 
@@ -408,7 +409,7 @@ class MethodContext(
       case v: KnownRef[_] => v
       case _ => KnownType(typ)
     }
-    assert(typ isAssignableFrom value.typ, "expected '" + typ + "' at " + idx + " but found " + value)
+    assert(typ isAssignableFrom value.getType.get, "expected '" + typ + "' at " + idx + " but found " + value)
     new MethodContext(stack.tail, locals.update(idx, value))
   }
 
@@ -537,7 +538,7 @@ class MethodContext(
 
   private def aaload() = {
     val arrayRef = stack.tail.head
-    arrayRef match {
+    arrayRef match { // TODO: match KnownRef
       case KnownType(arrayType) => aload(arrayType.getComponentType)
       case _ => aload(classOf[Object])
     }
