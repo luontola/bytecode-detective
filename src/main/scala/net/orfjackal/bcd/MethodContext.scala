@@ -347,7 +347,7 @@ class MethodContext(
     assert(insn.getOpcode == Opcodes.IINC)
     val idx = insn.`var`
     val value = KnownType(classOf[Int])
-    new MethodContext(stack, locals.update(idx, value))
+    new MethodContext(stack, locals.updated(idx, value))
   }
 
   private def updateValues(insn: TableSwitchInsnNode) = {
@@ -400,7 +400,7 @@ class MethodContext(
       case _ => KnownType(typ)
     }
     assert(typ isAssignableFrom value.getType.get, "expected '" + typ + "' at " + idx + " but found " + value)
-    new MethodContext(value :: stack, locals.update(idx, value))
+    new MethodContext(value :: stack, locals.updated(idx, value))
   }
 
   private def store(idx: Int, typ: Class[_]) = {
@@ -410,7 +410,7 @@ class MethodContext(
       case _ => KnownType(typ)
     }
     assert(typ isAssignableFrom value.getType.get, "expected '" + typ + "' at " + idx + " but found " + value)
-    new MethodContext(stack.tail, locals.update(idx, value))
+    new MethodContext(stack.tail, locals.updated(idx, value))
   }
 
   // "Implementors are free to decide the appropriate way to divide a 64-bit data value between two local variables."
@@ -525,7 +525,7 @@ class MethodContext(
   }
 
   private def multianewarray(componentType: Class[_], dimensions: Int) = {
-    val array = java.lang.reflect.Array.newInstance(componentType, new Array[Int](dimensions))
+    val array = java.lang.reflect.Array.newInstance(componentType, new Array[Int](dimensions): _*)
     var c = this
     for (i <- 0 until dimensions)
       c = c.pop()
