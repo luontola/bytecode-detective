@@ -6,10 +6,8 @@ package net.orfjackal.bcd
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree._
 import org.specs._
-import org.specs.runner._
-
 object interpretJumpSpec extends Specification {
-  "When an instruction is executed" should {
+  "When an instruction is executed" >> {
     def exec(insn: AbstractInsnNode) = {
       val c = new MethodContext(List(UnknownValue()), Map.empty)
       c.execute(insn)
@@ -30,21 +28,21 @@ object interpretJumpSpec extends Specification {
     list.add(label)
     list.add(r2)
 
-    "a normal instruction is followed by the next instruction" in {
+    "a normal instruction is followed by the next instruction" >> {
       exec(n1).nextInstructions must_== Set(jump)
       exec(n2).nextInstructions must_== Set(r1)
       exec(label).nextInstructions must_== Set(r2)
     }
-    "a jump instruction is followed by one of many instructions" in {
+    "a jump instruction is followed by one of many instructions" >> {
       exec(jump).nextInstructions must_== Set(n2, label)
     }
-    "the method's end is not followed by anything" in {
+    "the method's end is not followed by anything" >> {
       exec(r1).nextInstructions must_== Set() // return in the middle
       exec(r2).nextInstructions must_== Set() // return in the end
     }
   }
 
-  "Jumping" should {
+  "Jumping" >> {
     val n1 = new InsnNode(Opcodes.ICONST_1)
     val label = new LabelNode()
     val n2 = new InsnNode(Opcodes.ICONST_2)
@@ -69,97 +67,97 @@ object interpretJumpSpec extends Specification {
       c.execute(insn)
     }
 
-    "IFEQ" in {
+    "IFEQ" >> {
       val c = exec(new JumpInsnNode(Opcodes.IFEQ, label))
       c.nextInstructions must_== Set(n1, label)
       c.stack.size must_== ORIG_STACK_SIZE - 1
     }
-    "IFNE" in {
+    "IFNE" >> {
       val c = exec(new JumpInsnNode(Opcodes.IFNE, label))
       c.nextInstructions must_== Set(n1, label)
       c.stack.size must_== ORIG_STACK_SIZE - 1
     }
-    "IFLT" in {
+    "IFLT" >> {
       val c = exec(new JumpInsnNode(Opcodes.IFLT, label))
       c.nextInstructions must_== Set(n1, label)
       c.stack.size must_== ORIG_STACK_SIZE - 1
     }
-    "IFGE" in {
+    "IFGE" >> {
       val c = exec(new JumpInsnNode(Opcodes.IFGE, label))
       c.nextInstructions must_== Set(n1, label)
       c.stack.size must_== ORIG_STACK_SIZE - 1
     }
-    "IFGT" in {
+    "IFGT" >> {
       val c = exec(new JumpInsnNode(Opcodes.IFGT, label))
       c.nextInstructions must_== Set(n1, label)
       c.stack.size must_== ORIG_STACK_SIZE - 1
     }
-    "IFLE" in {
+    "IFLE" >> {
       val c = exec(new JumpInsnNode(Opcodes.IFLE, label))
       c.nextInstructions must_== Set(n1, label)
       c.stack.size must_== ORIG_STACK_SIZE - 1
     }
-    "IF_ICMPEQ" in {
+    "IF_ICMPEQ" >> {
       val c = exec(new JumpInsnNode(Opcodes.IF_ICMPEQ, label))
       c.nextInstructions must_== Set(n1, label)
       c.stack.size must_== ORIG_STACK_SIZE - 2
     }
-    "IF_ICMPNE" in {
+    "IF_ICMPNE" >> {
       val c = exec(new JumpInsnNode(Opcodes.IF_ICMPNE, label))
       c.nextInstructions must_== Set(n1, label)
       c.stack.size must_== ORIG_STACK_SIZE - 2
     }
-    "IF_ICMPLT" in {
+    "IF_ICMPLT" >> {
       val c = exec(new JumpInsnNode(Opcodes.IF_ICMPLT, label))
       c.nextInstructions must_== Set(n1, label)
       c.stack.size must_== ORIG_STACK_SIZE - 2
     }
-    "IF_ICMPGE" in {
+    "IF_ICMPGE" >> {
       val c = exec(new JumpInsnNode(Opcodes.IF_ICMPGE, label))
       c.nextInstructions must_== Set(n1, label)
       c.stack.size must_== ORIG_STACK_SIZE - 2
     }
-    "IF_ICMPGT" in {
+    "IF_ICMPGT" >> {
       val c = exec(new JumpInsnNode(Opcodes.IF_ICMPGT, label))
       c.nextInstructions must_== Set(n1, label)
       c.stack.size must_== ORIG_STACK_SIZE - 2
     }
-    "IF_ICMPLE" in {
+    "IF_ICMPLE" >> {
       val c = exec(new JumpInsnNode(Opcodes.IF_ICMPLE, label))
       c.nextInstructions must_== Set(n1, label)
       c.stack.size must_== ORIG_STACK_SIZE - 2
     }
-    "IF_ACMPEQ" in {
+    "IF_ACMPEQ" >> {
       val c = exec(new JumpInsnNode(Opcodes.IF_ACMPEQ, label))
       c.nextInstructions must_== Set(n1, label)
       c.stack.size must_== ORIG_STACK_SIZE - 2
     }
-    "IF_ACMPNE" in {
+    "IF_ACMPNE" >> {
       val c = exec(new JumpInsnNode(Opcodes.IF_ACMPNE, label))
       c.nextInstructions must_== Set(n1, label)
       c.stack.size must_== ORIG_STACK_SIZE - 2
     }
-    "GOTO" in {
+    "GOTO" >> {
       val c = exec(new JumpInsnNode(Opcodes.GOTO, label))
       c.nextInstructions must_== Set(label)
       c.stack.size must_== ORIG_STACK_SIZE
     }
-    "IFNULL" in {
+    "IFNULL" >> {
       val c = exec(new JumpInsnNode(Opcodes.IFNULL, label))
       c.nextInstructions must_== Set(n1, label)
       c.stack.size must_== ORIG_STACK_SIZE - 1
     }
-    "IFNONNULL" in {
+    "IFNONNULL" >> {
       val c = exec(new JumpInsnNode(Opcodes.IFNONNULL, label))
       c.nextInstructions must_== Set(n1, label)
       c.stack.size must_== ORIG_STACK_SIZE - 1
     }
-    "TABLESWITCH" in {
+    "TABLESWITCH" >> {
       val c = exec(new TableSwitchInsnNode(10, 12, sw1, Array(sw2, sw3)))
       c.nextInstructions must_== Set(sw1, sw2, sw3)
       c.stack.size must_== ORIG_STACK_SIZE - 1
     }
-    "LOOKUPSWITCH" in {
+    "LOOKUPSWITCH" >> {
       val c = exec(new LookupSwitchInsnNode(sw1, Array(10, 20), Array(sw2, sw3)))
       c.nextInstructions must_== Set(sw1, sw2, sw3)
       c.stack.size must_== ORIG_STACK_SIZE - 1

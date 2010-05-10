@@ -6,154 +6,152 @@ package net.orfjackal.bcd
 import org.objectweb.asm._
 import org.objectweb.asm.tree._
 import org.specs._
-import org.specs.runner._
-
 object interpretArraySpec extends Specification {
   def exec(stack: List[Value], insn: AbstractInsnNode) = {
     val c = new MethodContext(stack, Map.empty)
     c.execute(insn)
   }
 
-  "Creating and operating arrays" should {
+  "Creating and operating arrays" >> {
     val arrayLengthParam = List(KnownValue(10, classOf[Int]))
-    "NEWARRAY boolean" in {
+    "NEWARRAY boolean" >> {
       val c = exec(arrayLengthParam, new IntInsnNode(Opcodes.NEWARRAY, Opcodes.T_BOOLEAN))
       c.stack must_== List(KnownType(classOf[Array[Boolean]]))
     }
-    "NEWARRAY char" in {
+    "NEWARRAY char" >> {
       val c = exec(arrayLengthParam, new IntInsnNode(Opcodes.NEWARRAY, Opcodes.T_CHAR))
       c.stack must_== List(KnownType(classOf[Array[Char]]))
     }
-    "NEWARRAY float" in {
+    "NEWARRAY float" >> {
       val c = exec(arrayLengthParam, new IntInsnNode(Opcodes.NEWARRAY, Opcodes.T_FLOAT))
       c.stack must_== List(KnownType(classOf[Array[Float]]))
     }
-    "NEWARRAY double" in {
+    "NEWARRAY double" >> {
       val c = exec(arrayLengthParam, new IntInsnNode(Opcodes.NEWARRAY, Opcodes.T_DOUBLE))
       c.stack must_== List(KnownType(classOf[Array[Double]]))
     }
-    "NEWARRAY byte" in {
+    "NEWARRAY byte" >> {
       val c = exec(arrayLengthParam, new IntInsnNode(Opcodes.NEWARRAY, Opcodes.T_BYTE))
       c.stack must_== List(KnownType(classOf[Array[Byte]]))
     }
-    "NEWARRAY short" in {
+    "NEWARRAY short" >> {
       val c = exec(arrayLengthParam, new IntInsnNode(Opcodes.NEWARRAY, Opcodes.T_SHORT))
       c.stack must_== List(KnownType(classOf[Array[Short]]))
     }
-    "NEWARRAY int" in {
+    "NEWARRAY int" >> {
       val c = exec(arrayLengthParam, new IntInsnNode(Opcodes.NEWARRAY, Opcodes.T_INT))
       c.stack must_== List(KnownType(classOf[Array[Int]]))
     }
-    "NEWARRAY long" in {
+    "NEWARRAY long" >> {
       val c = exec(arrayLengthParam, new IntInsnNode(Opcodes.NEWARRAY, Opcodes.T_LONG))
       c.stack must_== List(KnownType(classOf[Array[Long]]))
     }
-    "ANEWARRAY" in {
+    "ANEWARRAY" >> {
       val c = exec(arrayLengthParam, new TypeInsnNode(Opcodes.ANEWARRAY, "java/lang/String"))
       c.stack must_== List(KnownType(classOf[Array[String]]))
     }
-    "MULTIANEWARRAY" in {
+    "MULTIANEWARRAY" >> {
       val params = List(KnownValue(10, classOf[Int]), KnownValue(20, classOf[Int]))
       val c = exec(params, new MultiANewArrayInsnNode("java/lang/String", 2))
       c.stack must_== List(KnownType(classOf[Array[Array[String]]]))
     }
-    "ARRAYLENGTH" in {
+    "ARRAYLENGTH" >> {
       val params = List(KnownType(classOf[Array[String]]))
       val c = exec(params, new InsnNode(Opcodes.ARRAYLENGTH))
       c.stack must_== List(KnownType(classOf[Int]))
     }
   }
 
-  "Loading from arrays" should {
-    "BALOAD" in {
+  "Loading from arrays" >> {
+    "BALOAD" >> {
       val params = List(KnownType(classOf[Int]), KnownType(classOf[Array[Byte]]))
       val c = exec(params, new InsnNode(Opcodes.BALOAD))
       c.stack must_== List(KnownType(classOf[Byte]))
     }
-    "CALOAD" in {
+    "CALOAD" >> {
       val params = List(KnownType(classOf[Int]), KnownType(classOf[Array[Char]]))
       val c = exec(params, new InsnNode(Opcodes.CALOAD))
       c.stack must_== List(KnownType(classOf[Char]))
     }
-    "SALOAD" in {
+    "SALOAD" >> {
       val params = List(KnownType(classOf[Int]), KnownType(classOf[Array[Short]]))
       val c = exec(params, new InsnNode(Opcodes.SALOAD))
       c.stack must_== List(KnownType(classOf[Short]))
     }
-    "IALOAD" in {
+    "IALOAD" >> {
       val params = List(KnownType(classOf[Int]), KnownType(classOf[Array[Int]]))
       val c = exec(params, new InsnNode(Opcodes.IALOAD))
       c.stack must_== List(KnownType(classOf[Int]))
     }
-    "LALOAD" in {
+    "LALOAD" >> {
       val params = List(KnownType(classOf[Int]), KnownType(classOf[Array[Long]]))
       val c = exec(params, new InsnNode(Opcodes.LALOAD))
       c.stack must_== List(KnownType(classOf[Long]), KnownType(classOf[Long]))
     }
-    "FALOAD" in {
+    "FALOAD" >> {
       val params = List(KnownType(classOf[Int]), KnownType(classOf[Array[Float]]))
       val c = exec(params, new InsnNode(Opcodes.FALOAD))
       c.stack must_== List(KnownType(classOf[Float]))
     }
-    "DALOAD" in {
+    "DALOAD" >> {
       val params = List(KnownType(classOf[Int]), KnownType(classOf[Array[Double]]))
       val c = exec(params, new InsnNode(Opcodes.DALOAD))
       c.stack must_== List(KnownType(classOf[Double]), KnownType(classOf[Double]))
     }
-    "AALOAD unknown array type" in {
+    "AALOAD unknown array type" >> {
       val params = List(KnownType(classOf[Int]), UnknownValue())
       val c = exec(params, new InsnNode(Opcodes.AALOAD))
       c.stack must_== List(KnownType(classOf[Object]))
     }
-    "AALOAD known array type" in {
+    "AALOAD known array type" >> {
       val params = List(KnownType(classOf[Int]), KnownType(classOf[Array[String]]))
       val c = exec(params, new InsnNode(Opcodes.AALOAD))
       c.stack must_== List(KnownType(classOf[String]))
     }
-    "AALOAD known array value" in {
+    "AALOAD known array value" >> {
       val params = List(KnownType(classOf[Int]), KnownRef(Array[String]("x"), classOf[Array[String]]))
       val c = exec(params, new InsnNode(Opcodes.AALOAD))
       c.stack must_== List(KnownType(classOf[String]))
     }
   }
 
-  "Storing to arrays" should {
-    "BASTORE" in {
+  "Storing to arrays" >> {
+    "BASTORE" >> {
       val params = List(KnownType(classOf[Byte]), KnownType(classOf[Int]), KnownType(classOf[Array[Byte]]))
       val c = exec(params, new InsnNode(Opcodes.BASTORE))
       c.stack must_== Nil
     }
-    "CASTORE" in {
+    "CASTORE" >> {
       val params = List(KnownType(classOf[Char]), KnownType(classOf[Int]), KnownType(classOf[Array[Char]]))
       val c = exec(params, new InsnNode(Opcodes.CASTORE))
       c.stack must_== Nil
     }
-    "SASTORE" in {
+    "SASTORE" >> {
       val params = List(KnownType(classOf[Short]), KnownType(classOf[Int]), KnownType(classOf[Array[Short]]))
       val c = exec(params, new InsnNode(Opcodes.SASTORE))
       c.stack must_== Nil
     }
-    "IASTORE" in {
+    "IASTORE" >> {
       val params = List(KnownType(classOf[Int]), KnownType(classOf[Int]), KnownType(classOf[Array[Int]]))
       val c = exec(params, new InsnNode(Opcodes.IASTORE))
       c.stack must_== Nil
     }
-    "LASTORE" in {
+    "LASTORE" >> {
       val params = List(KnownType(classOf[Long]), KnownType(classOf[Long]), KnownType(classOf[Int]), KnownType(classOf[Array[Long]]))
       val c = exec(params, new InsnNode(Opcodes.LASTORE))
       c.stack must_== Nil
     }
-    "FASTORE" in {
+    "FASTORE" >> {
       val params = List(KnownType(classOf[Float]), KnownType(classOf[Int]), KnownType(classOf[Array[Float]]))
       val c = exec(params, new InsnNode(Opcodes.FASTORE))
       c.stack must_== Nil
     }
-    "DASTORE" in {
+    "DASTORE" >> {
       val params = List(KnownType(classOf[Double]), KnownType(classOf[Double]), KnownType(classOf[Int]), KnownType(classOf[Array[Double]]))
       val c = exec(params, new InsnNode(Opcodes.DASTORE))
       c.stack must_== Nil
     }
-    "AASTORE" in {
+    "AASTORE" >> {
       val params = List(KnownType(classOf[String]), KnownType(classOf[Int]), KnownType(classOf[Array[String]]))
       val c = exec(params, new InsnNode(Opcodes.AASTORE))
       c.stack must_== Nil

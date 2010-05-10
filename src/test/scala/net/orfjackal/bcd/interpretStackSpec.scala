@@ -6,10 +6,8 @@ package net.orfjackal.bcd
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree._
 import org.specs._
-import org.specs.runner._
-
 object interpretStackSpec extends Specification {
-  "Operating the stack" should {
+  "Operating the stack" >> {
     def exec(insn: AbstractInsnNode) = {
       val stack = List(
         KnownValue(1, classOf[Int]),
@@ -19,20 +17,20 @@ object interpretStackSpec extends Specification {
       val c = new MethodContext(stack, Map.empty)
       c.execute(insn)
     }
-    "POP" in {
+    "POP" >> {
       val c = exec(new InsnNode(Opcodes.POP))
       c.stack must_== List(
         KnownValue(2, classOf[Int]),
         KnownValue(3, classOf[Int]),
         KnownValue(4, classOf[Int]))
     }
-    "POP2" in {
+    "POP2" >> {
       val c = exec(new InsnNode(Opcodes.POP2))
       c.stack must_== List(
         KnownValue(3, classOf[Int]),
         KnownValue(4, classOf[Int]))
     }
-    "DUP" in {
+    "DUP" >> {
       val c = exec(new InsnNode(Opcodes.DUP))
       c.stack must_== List(
         KnownValue(1, classOf[Int]),
@@ -41,7 +39,7 @@ object interpretStackSpec extends Specification {
         KnownValue(3, classOf[Int]),
         KnownValue(4, classOf[Int]))
     }
-    "DUP_X1" in {
+    "DUP_X1" >> {
       val c = exec(new InsnNode(Opcodes.DUP_X1))
       c.stack must_== List(
         KnownValue(1, classOf[Int]),
@@ -50,7 +48,7 @@ object interpretStackSpec extends Specification {
         KnownValue(3, classOf[Int]),
         KnownValue(4, classOf[Int]))
     }
-    "DUP_X2" in {
+    "DUP_X2" >> {
       val c = exec(new InsnNode(Opcodes.DUP_X2))
       c.stack must_== List(
         KnownValue(1, classOf[Int]),
@@ -59,7 +57,7 @@ object interpretStackSpec extends Specification {
         KnownValue(1, classOf[Int]),
         KnownValue(4, classOf[Int]))
     }
-    "DUP2" in {
+    "DUP2" >> {
       val c = exec(new InsnNode(Opcodes.DUP2))
       c.stack must_== List(
         KnownValue(1, classOf[Int]),
@@ -69,7 +67,7 @@ object interpretStackSpec extends Specification {
         KnownValue(3, classOf[Int]),
         KnownValue(4, classOf[Int]))
     }
-    "DUP2_X1" in {
+    "DUP2_X1" >> {
       val c = exec(new InsnNode(Opcodes.DUP2_X1))
       c.stack must_== List(
         KnownValue(1, classOf[Int]),
@@ -79,7 +77,7 @@ object interpretStackSpec extends Specification {
         KnownValue(2, classOf[Int]),
         KnownValue(4, classOf[Int]))
     }
-    "DUP2_X2" in {
+    "DUP2_X2" >> {
       val c = exec(new InsnNode(Opcodes.DUP2_X2))
       c.stack must_== List(
         KnownValue(1, classOf[Int]),
@@ -89,7 +87,7 @@ object interpretStackSpec extends Specification {
         KnownValue(1, classOf[Int]),
         KnownValue(2, classOf[Int]))
     }
-    "SWAP" in {
+    "SWAP" >> {
       val c = exec(new InsnNode(Opcodes.SWAP))
       c.stack must_== List(
         KnownValue(2, classOf[Int]),
