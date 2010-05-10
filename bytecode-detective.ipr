@@ -58,6 +58,15 @@
     <option name="DEPRECATION" value="false" />
   </component>
   <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false" />
+  <component name="FacetAutodetectingManager">
+    <autodetection-disabled>
+      <facet-type id="Scala">
+        <modules>
+          <module name="bytecode-detective" />
+        </modules>
+      </facet-type>
+    </autodetection-disabled>
+  </component>
   <component name="InspectionProjectProfileManager">
     <profiles>
       <profile version="1.0" is_locked="false">
@@ -293,11 +302,43 @@
     <output url="file://$PROJECT_DIR$/classes" />
   </component>
   <component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="allSuite" type="JUnit" factoryName="JUnit">
+      <extension name="coverage" enabled="false" merge="false" per_test_coverage_enabled="false" sample_coverage="true" track_test_folders="true" runner="idea">
+        <pattern>
+          <option name="PATTERN" value="net.orfjackal.bcd.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <extension name="snapshooter" />
+      <module name="bytecode-detective" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <option name="PACKAGE_NAME" value="net.orfjackal.bcd" />
+      <option name="MAIN_CLASS_NAME" value="net.orfjackal.bcd.allSuite" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <envs />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
     <configuration default="false" name="allSpecs" type="SpecsRunConfiguration" factoryName="Specs">
       <module name="bytecode-detective" />
       <setting name="path" value="net.orfjackal.bcd.allSpecs" />
       <setting name="vmparams" value="-ea" />
       <setting name="params" value="" />
+      <setting name="packagepath" value="" />
+      <setting name="workingDirectory" value="$PROJECT_DIR$" />
+      <setting name="sysFilter" value=".*" />
+      <setting name="exampleFilter" value=".*" />
       <RunnerSettings RunnerId="Profile CPU">
         <option name="startFromMode" value="MAIN_CLASS" />
         <option name="otherClassesToStartFrom" value="" />
@@ -313,9 +354,7 @@
       </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Run" />
-      <method>
-        <option name="Make" enabled="true" />
-      </method>
+      <method />
     </configuration>
   </component>
   <component name="ResourceManagerContainer">
@@ -378,17 +417,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/asm/asm-commons/3.1/asm-commons-3.1-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.scala-tools.testing:specs:1.6.1-2.8.0.Beta1-RC6">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/scala-tools/testing/specs/1.6.1-2.8.0.Beta1-RC6/specs-1.6.1-2.8.0.Beta1-RC6.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/scala-tools/testing/specs/1.6.1-2.8.0.Beta1-RC6/specs-1.6.1-2.8.0.Beta1-RC6-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/scala-tools/testing/specs/1.6.1-2.8.0.Beta1-RC6/specs-1.6.1-2.8.0.Beta1-RC6-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: junit:junit:4.7">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/junit/junit/4.7/junit-4.7.jar!/" />
@@ -400,37 +428,48 @@
         <root url="jar://$MAVEN_REPOSITORY$/junit/junit/4.7/junit-4.7-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.mockito:mockito-all:1.8.1">
+    <library name="Maven: org.mockito:mockito-all:1.8.2">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/mockito/mockito-all/1.8.1/mockito-all-1.8.1.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/mockito/mockito-all/1.8.2/mockito-all-1.8.2.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/mockito/mockito-all/1.8.1/mockito-all-1.8.1-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/mockito/mockito-all/1.8.2/mockito-all-1.8.2-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/mockito/mockito-all/1.8.1/mockito-all-1.8.1-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/mockito/mockito-all/1.8.2/mockito-all-1.8.2-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.scala-lang:scala-library:2.8.0.Beta1">
+    <library name="Maven: org.scala-lang:scala-library:2.8.0.RC1">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.8.0.Beta1/scala-library-2.8.0.Beta1.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.8.0.RC1/scala-library-2.8.0.RC1.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.8.0.Beta1/scala-library-2.8.0.Beta1-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.8.0.RC1/scala-library-2.8.0.RC1-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.8.0.Beta1/scala-library-2.8.0.Beta1-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.8.0.RC1/scala-library-2.8.0.RC1-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.scala-lang:scala-compiler:2.8.0.Beta1">
+    <library name="Maven: org.scala-lang:scala-compiler:2.8.0.RC1">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-compiler/2.8.0.Beta1/scala-compiler-2.8.0.Beta1.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-compiler/2.8.0.RC1/scala-compiler-2.8.0.RC1.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-compiler/2.8.0.Beta1/scala-compiler-2.8.0.Beta1-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-compiler/2.8.0.RC1/scala-compiler-2.8.0.RC1-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-compiler/2.8.0.Beta1/scala-compiler-2.8.0.Beta1-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-compiler/2.8.0.RC1/scala-compiler-2.8.0.RC1-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.scala-tools.testing:specs_2.8.0.RC1:1.6.5-SNAPSHOT">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/scala-tools/testing/specs_2.8.0.RC1/1.6.5-SNAPSHOT/specs_2.8.0.RC1-1.6.5-SNAPSHOT.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/scala-tools/testing/specs_2.8.0.RC1/1.6.5-SNAPSHOT/specs_2.8.0.RC1-1.6.5-SNAPSHOT-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/scala-tools/testing/specs_2.8.0.RC1/1.6.5-SNAPSHOT/specs_2.8.0.RC1-1.6.5-SNAPSHOT-sources.jar!/" />
       </SOURCES>
     </library>
   </component>
