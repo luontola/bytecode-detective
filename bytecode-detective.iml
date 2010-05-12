@@ -6,12 +6,12 @@
         <option name="takeFromSettings" value="true" />
         <option name="myScalaCompilerJarPaths">
           <array>
-            <option value="$MAVEN_REPOSITORY$/org/scala-lang/scala-compiler/2.8.0.RC1/scala-compiler-2.8.0.RC1.jar" />
+            <option value="$MAVEN_REPOSITORY$/org/scala-lang/scala-compiler/2.8.0.RC2/scala-compiler-2.8.0.RC2.jar" />
           </array>
         </option>
         <option name="myScalaSdkJarPaths">
           <array>
-            <option value="$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.8.0.RC1/scala-library-2.8.0.RC1.jar" />
+            <option value="$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.8.0.RC2/scala-library-2.8.0.RC2.jar" />
           </array>
         </option>
       </configuration>
@@ -29,13 +29,13 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="Maven: org.scala-lang:scala-library:2.8.0.RC1" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.scala-lang:scala-compiler:2.8.0.RC1" level="project" />
+    <orderEntry type="library" exported="" name="Maven: org.scala-lang:scala-library:2.8.0.RC2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.scala-lang:scala-compiler:2.8.0.RC2" level="project" />
     <orderEntry type="library" exported="" name="Maven: asm:asm:3.1" level="project" />
     <orderEntry type="library" exported="" name="Maven: asm:asm-tree:3.1" level="project" />
     <orderEntry type="library" exported="" name="Maven: asm:asm-commons:3.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: asm:asm-util:3.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.scala-tools.testing:specs_2.8.0.RC1:1.6.5-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.scala-tools.testing:specs_2.8.0.RC2:1.6.5-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.7" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.mockito:mockito-all:1.8.2" level="project" />
   </component>
