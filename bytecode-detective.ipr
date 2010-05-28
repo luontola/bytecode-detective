@@ -139,6 +139,11 @@
     <option name="USE_PROJECT_PROFILE" value="true" />
     <version value="1.0" />
   </component>
+  <component name="IvyIDEA.ProjectSettings">
+    <option name="propertiesSettings">
+      <PropertiesSettings />
+    </option>
+  </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_STRING" value="-target 1.6" />
   </component>
@@ -328,7 +333,20 @@
       <envs />
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Run" />
-      <method />
+      <method>
+        <option name="Make" enabled="false" />
+        <option name="Maven.BeforeRunTask" enabled="false" file="$PROJECT_DIR$/pom.xml" goal="test-compile" />
+        <option name="SBT.BeforeRunTask" enabled="true" action="test-compile" />
+      </method>
+    </configuration>
+    <configuration default="false" name="FSC" type="ScalaCompilationServerRunConfiguration" factoryName="Scala Compilation Server">
+      <module name="bytecode-detective" />
+      <setting name="vmparams" value="-Xmx512m -verbose" />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method>
+        <option name="Make" enabled="false" />
+      </method>
     </configuration>
     <configuration default="false" name="allSpecs" type="SpecsRunConfiguration" factoryName="Specs">
       <module name="bytecode-detective" />
@@ -363,6 +381,9 @@
         <list size="0" />
       </value>
     </option>
+  </component>
+  <component name="ScalacSettings">
+    <option name="USE_FSC" value="true" />
   </component>
   <component name="SvnBranchConfigurationManager">
     <option name="myVersion" value="124" />
