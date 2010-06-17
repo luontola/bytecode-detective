@@ -339,7 +339,7 @@
         <option name="SBT.BeforeRunTask" enabled="true" action="test-compile" />
       </method>
     </configuration>
-    <configuration default="false" name="FSC" type="ScalaCompilationServerRunConfiguration" factoryName="Scala Compilation Server">
+    <configuration default="false" name="fsc" type="ScalaCompilationServerRunConfiguration" factoryName="Scala Compilation Server">
       <module name="bytecode-detective" />
       <setting name="vmparams" value="-Xmx512m -verbose" />
       <RunnerSettings RunnerId="Run" />
@@ -460,37 +460,37 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/mockito/mockito-all/1.8.2/mockito-all-1.8.2-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.scala-lang:scala-library:2.8.0.RC2">
+    <library name="Maven: org.scala-lang:scala-library:2.8.0.RC5">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.8.0.RC2/scala-library-2.8.0.RC2.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.8.0.RC5/scala-library-2.8.0.RC5.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.8.0.RC2/scala-library-2.8.0.RC2-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.8.0.RC5/scala-library-2.8.0.RC5-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.8.0.RC2/scala-library-2.8.0.RC2-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.8.0.RC5/scala-library-2.8.0.RC5-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.scala-lang:scala-compiler:2.8.0.RC2">
+    <library name="Maven: org.scala-lang:scala-compiler:2.8.0.RC5">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-compiler/2.8.0.RC2/scala-compiler-2.8.0.RC2.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-compiler/2.8.0.RC5/scala-compiler-2.8.0.RC5.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-compiler/2.8.0.RC2/scala-compiler-2.8.0.RC2-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-compiler/2.8.0.RC5/scala-compiler-2.8.0.RC5-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-compiler/2.8.0.RC2/scala-compiler-2.8.0.RC2-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-compiler/2.8.0.RC5/scala-compiler-2.8.0.RC5-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.scala-tools.testing:specs_2.8.0.RC2:1.6.5-SNAPSHOT">
+    <library name="Maven: org.scala-tools.testing:specs_2.8.0.RC5:1.6.5-SNAPSHOT">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/scala-tools/testing/specs_2.8.0.RC2/1.6.5-SNAPSHOT/specs_2.8.0.RC2-1.6.5-SNAPSHOT.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/scala-tools/testing/specs_2.8.0.RC5/1.6.5-SNAPSHOT/specs_2.8.0.RC5-1.6.5-SNAPSHOT.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/scala-tools/testing/specs_2.8.0.RC2/1.6.5-SNAPSHOT/specs_2.8.0.RC2-1.6.5-SNAPSHOT-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/scala-tools/testing/specs_2.8.0.RC5/1.6.5-SNAPSHOT/specs_2.8.0.RC5-1.6.5-SNAPSHOT-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/scala-tools/testing/specs_2.8.0.RC2/1.6.5-SNAPSHOT/specs_2.8.0.RC2-1.6.5-SNAPSHOT-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/scala-tools/testing/specs_2.8.0.RC5/1.6.5-SNAPSHOT/specs_2.8.0.RC5-1.6.5-SNAPSHOT-sources.jar!/" />
       </SOURCES>
     </library>
   </component>
